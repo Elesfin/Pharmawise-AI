@@ -197,7 +197,13 @@ const SYMPTOMS_DATA = [
 
 import { GoogleGenAI, Type, GenerateContentResponse } from "@google/genai";
 
-const ai = new GoogleGenAI({ apiKey: process.env.GEMINI_API_KEY || "" });
+const getApiKey = () => {
+  const key = process.env.GEMINI_API_KEY;
+  if (!key || key === "MY_GEMINI_API_KEY" || key === "") {
+    return null;
+  }
+  return key;
+};
 
 const SEARCH_SUGGESTIONS = [
   'Amoxicilina',
@@ -285,8 +291,14 @@ export default function App() {
 
       const response = await askPharmaAI(userMessage, history);
       setMessages(prev => [...prev, { role: 'assistant', content: response || 'Desculpe, não consegui processar sua solicitação.' }]);
-    } catch (error) {
-      setMessages(prev => [...prev, { role: 'assistant', content: 'Ocorreu um erro ao processar sua pergunta. Por favor, tente novamente mais tarde.' }]);
+    } catch (error: any) {
+      let errorMessage = 'Ocorreu um erro ao processar sua pergunta. Por favor, tente novamente mais tarde.';
+      
+      if (error.message === 'API_KEY_MISSING') {
+        errorMessage = '### Erro de Configuração\n\nA chave da API do Gemini (GEMINI_API_KEY) não foi encontrada. \n\n**Se você estiver no Vercel:**\n1. Vá em Settings -> Environment Variables.\n2. Adicione `GEMINI_API_KEY` com sua chave.\n3. Faça um novo Deploy.';
+      }
+      
+      setMessages(prev => [...prev, { role: 'assistant', content: errorMessage }]);
     } finally {
       setIsLoading(false);
     }
@@ -339,8 +351,15 @@ export default function App() {
   };
 
   const generateLogo = async () => {
+    const apiKey = getApiKey();
+    if (!apiKey) {
+      setIsGeneratingLogo(false);
+      return;
+    }
+
     setIsGeneratingLogo(true);
     try {
+      const ai = new GoogleGenAI({ apiKey });
       const response = await ai.models.generateContent({
         model: 'gemini-2.5-flash-image',
         contents: {

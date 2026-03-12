@@ -1,6 +1,12 @@
 import { GoogleGenAI, Type } from "@google/genai";
 
-const ai = new GoogleGenAI({ apiKey: process.env.GEMINI_API_KEY || "" });
+const getApiKey = () => {
+  const key = process.env.GEMINI_API_KEY;
+  if (!key || key === "MY_GEMINI_API_KEY" || key === "") {
+    return null;
+  }
+  return key;
+};
 
 const SYSTEM_INSTRUCTION = `Você é o PharmaWise AI, um assistente técnico simplificado para farmácia de dispensação.
 Sua missão é responder perguntas sobre medicamentos e legislação farmacêutica de forma extremamente DIRETA e CONCISA.
@@ -22,6 +28,14 @@ DIRETRIZES:
 - Responda em Português do Brasil.`;
 
 export async function askPharmaAI(prompt: string, history: any[] = []) {
+  const apiKey = getApiKey();
+  
+  if (!apiKey) {
+    throw new Error("API_KEY_MISSING");
+  }
+
+  const ai = new GoogleGenAI({ apiKey });
+
   try {
     const response = await ai.models.generateContent({
       model: "gemini-3-flash-preview",
