@@ -29,7 +29,9 @@ import {
   WifiOff,
   ChevronLeft,
   Stethoscope,
-  Thermometer
+  Thermometer,
+  Gavel,
+  Scale
 } from 'lucide-react';
 import Markdown from 'react-markdown';
 import { motion, AnimatePresence } from 'motion/react';
@@ -211,7 +213,8 @@ import { GoogleGenAI, Type, GenerateContentResponse } from "@google/genai";
 
 const getApiKey = () => {
   const key = process.env.GEMINI_API_KEY;
-  if (!key || key === "MY_GEMINI_API_KEY" || key === "") {
+  // AI Studio injects the key. We check for common placeholders or empty values.
+  if (!key || key === "MY_GEMINI_API_KEY" || key === "" || key.includes("TODO")) {
     return null;
   }
   return key;
@@ -243,10 +246,11 @@ export default function App() {
   const [input, setInput] = useState('');
   const [isLoading, setIsLoading] = useState(false);
   const [showReference, setShowReference] = useState(false);
-  const [activeTab, setActiveTab] = useState<'forms' | 'interactions' | 'posology' | 'featured' | 'symptoms'>('forms');
+  const [activeTab, setActiveTab] = useState<'forms' | 'interactions' | 'posology' | 'featured' | 'symptoms' | 'legislation'>('forms');
   const [checker, setChecker] = useState({ drugA: '', drugB: '' });
   const [posologySearch, setPosologySearch] = useState('');
   const [symptomSearch, setSymptomSearch] = useState('');
+  const [legislationSearch, setLegislationSearch] = useState('');
   const [calculator, setCalculator] = useState({ medication: '', weight: '', frequency: '8h' });
   const [isOnline, setIsOnline] = useState(navigator.onLine);
   const [filteredSuggestions, setFilteredSuggestions] = useState<string[]>([]);
@@ -310,7 +314,9 @@ export default function App() {
       let errorMessage = 'Ocorreu um erro ao processar sua pergunta. Por favor, tente novamente mais tarde.';
       
       if (error.message === 'API_KEY_MISSING') {
-        errorMessage = '### Erro de Configuração\n\nA chave da API do Gemini (GEMINI_API_KEY) não foi encontrada. \n\n**Se você estiver no Vercel:**\n1. Vá em Settings -> Environment Variables.\n2. Adicione `GEMINI_API_KEY` com sua chave.\n3. Faça um novo Deploy.';
+        errorMessage = '### 🔑 Erro de Configuração da API\n\nA chave da API do Gemini não foi detectada.\n\n**Como resolver:**\n1. Clique no ícone de **Configurações** (engrenagem) no menu lateral do AI Studio.\n2. Vá em **Secrets**.\n3. Certifique-se de que a `GEMINI_API_KEY` está configurada corretamente.\n4. Se você acabou de adicionar, tente atualizar a página.';
+      } else if (error.message?.includes('quota') || error.message?.includes('429')) {
+        errorMessage = '### ⏳ Limite de Uso Atingido\n\nVocê atingiu o limite de uso gratuito do Gemini para este período.\n\n**O que fazer:**\n1. Aguarde alguns minutos ou horas para o limite resetar.\n2. Use o **Banco de Dados Offline** (barra lateral) que continua funcionando normalmente!\n3. Verifique se você está usando o modelo correto nas configurações.';
       }
       
       setMessages(prev => [...prev, { role: 'assistant', content: errorMessage }]);
@@ -319,43 +325,84 @@ export default function App() {
     }
   };
 
+  const normalizeText = (text: string) => {
+    return text
+      .toLowerCase()
+      .normalize("NFD")
+      .replace(/[\u0300-\u036f]/g, "") // Remove accents
+      .trim();
+  };
+
+  const levenshteinDistance = (a: string, b: string): number => {
+    const matrix = Array.from({ length: a.length + 1 }, (_, i) => [i]);
+    for (let j = 1; j <= b.length; j++) matrix[0][j] = j;
+
+    for (let i = 1; i <= a.length; i++) {
+      for (let j = 1; j <= b.length; j++) {
+        const cost = a[i - 1] === b[j - 1] ? 0 : 1;
+        matrix[i][j] = Math.min(
+          matrix[i - 1][j] + 1,
+          matrix[i][j - 1] + 1,
+          matrix[i - 1][j - 1] + cost
+        );
+      }
+    }
+    return matrix[a.length][b.length];
+  };
+
   const searchOffline = (query: string): string => {
-    const q = query.toLowerCase().trim();
+    const q = normalizeText(query);
+    const queryTokens = q.split(/[ +()]+/).filter(t => t.length > 2);
     let results: string[] = [];
+
+    const isPosologyQuery = q.includes('posologia') || q.includes('dose') || q.includes('quanto') || q.includes('calcule');
+    const isInteractionQuery = q.includes('interacao') || q.includes('conflito') || q.includes('misturar');
 
     // 1. O(1) Lookup for Exact Matches (Fastest)
     const exactMed = MEDS_MAP.get(q);
     if (exactMed) {
-      results.push(`### 💊 ${exactMed.name}\n**Classe:** ${exactMed.class}\n**Indicação:** ${exactMed.indication}\n\n**Posologia:**\n- Adulto: ${exactMed.dosageAdult}\n- Criança: ${exactMed.dosageChild}\n\n**Interações:** ${exactMed.interactions.join(', ')}\n**Contraindicações:** ${exactMed.contraindications.join(', ')}\n**Efeitos Colaterais:** ${exactMed.sideEffects.join(', ')}\n\n**Notas Técnicas:** ${exactMed.notes}`);
+      if (isPosologyQuery) {
+        results.push(`### 📏 Posologia: ${exactMed.name}\n\n**Adulto:** ${exactMed.dosageAdult}\n**Pediátrico:** ${exactMed.dosageChild}\n\n**Nota:** ${exactMed.notes}`);
+      } else {
+        results.push(`### 💊 ${exactMed.name}\n**Classe:** ${exactMed.class}\n**Indicação:** ${exactMed.indication}\n\n**Posologia:**\n- Adulto: ${exactMed.dosageAdult}\n- Criança: ${exactMed.dosageChild}\n\n**Interações:** ${exactMed.interactions.join(', ')}\n**Contraindicações:** ${exactMed.contraindications.join(', ')}\n**Efeitos Colaterais:** ${exactMed.sideEffects.join(', ')}\n\n**Notas Técnicas:** ${exactMed.notes}`);
+      }
     }
 
-    const exactSymptom = SYMPTOMS_MAP.get(q);
-    if (exactSymptom) {
-      const meds = exactSymptom.recommendations.map(m => `- **${m.name}** (${m.class}): ${m.note}`).join('\n');
-      results.push(`### 🌡️ Guia para: ${exactSymptom.symptom}\n**Medicamentos sugeridos:**\n${meds}`);
-    }
-
-    // 2. Optimized Keyword Search (if no exact match or to find more)
+    // 2. Fuzzy and Keyword Search
     if (results.length === 0) {
-      // Search in Meds Index
+      // Search in Meds
       SEARCH_INDEX.meds.forEach(m => {
-        if (m.name.includes(q) || q.includes(m.name)) {
-          results.push(`### 💊 ${m.data.name}\n**Classe:** ${m.data.class}\n**Indicação:** ${m.data.indication}\n\n**Posologia:**\n- Adulto: ${m.data.dosageAdult}\n- Criança: ${m.data.dosageChild}`);
+        const medName = normalizeText(m.name);
+        const distance = levenshteinDistance(q, medName);
+        const isFuzzyMatch = distance <= 2 && medName.length > 4;
+        const isTokenMatch = queryTokens.some(t => medName.includes(t) || t.includes(medName));
+
+        if (isFuzzyMatch || isTokenMatch || q.includes(medName) || medName.includes(q)) {
+          if (isPosologyQuery) {
+            results.push(`### 📏 Posologia: ${m.data.name}\n**Adulto:** ${m.data.dosageAdult}\n**Pediátrico:** ${m.data.dosageChild}\n\n*Nota: ${m.data.notes}*`);
+          } else {
+            results.push(`### 💊 ${m.data.name}\n**Classe:** ${m.data.class}\n**Indicação:** ${m.data.indication}\n\n**Posologia:**\n- Adulto: ${m.data.dosageAdult}\n- Criança: ${m.data.dosageChild}`);
+          }
         }
       });
 
-      // Search in Interactions Index (Tokenized)
-      const queryTokens = q.split(/[ +()]+/).filter(t => t.length > 2);
+      // Search in Interactions
       SEARCH_INDEX.interactions.forEach(i => {
-        const hasMatch = i.tokens.some(token => queryTokens.includes(token)) || i.drugs.includes(q);
-        if (hasMatch) {
+        const hasMatch = i.tokens.some(token => queryTokens.includes(normalizeText(token))) || 
+                         i.drugs.toLowerCase().includes(q);
+        if (hasMatch || (isInteractionQuery && queryTokens.some(t => i.drugs.toLowerCase().includes(t)))) {
           results.push(`### ⚠️ Interação: ${i.data.drugs}\n**Nível:** ${i.data.level}\n**Efeito:** ${i.data.effect}\n**Risco:** ${i.data.risk}`);
         }
       });
 
-      // Search in Symptoms Index
+      // Search in Symptoms
       SEARCH_INDEX.symptoms.forEach(s => {
-        if (s.symptom.includes(q) || q.includes(s.symptom)) {
+        const symptomName = normalizeText(s.symptom);
+        const distance = levenshteinDistance(q, symptomName);
+        const isFuzzyMatch = distance <= 2 && symptomName.length > 4;
+        const isTokenMatch = queryTokens.some(t => symptomName.includes(t) || t.includes(symptomName));
+
+        if (isFuzzyMatch || isTokenMatch || q.includes(symptomName) || symptomName.includes(q)) {
           const meds = s.data.recommendations.map(m => `- **${m.name}** (${m.class}): ${m.note}`).join('\n');
           results.push(`### 🌡️ Guia para: ${s.data.symptom}\n**Medicamentos sugeridos:**\n${meds}`);
         }
@@ -363,10 +410,11 @@ export default function App() {
 
       // Search in Legislation
       OFFLINE_LEGISLATION.forEach(leg => {
-        const isMatch = leg.title.toLowerCase().includes(q) || 
-                        leg.examples.some(ex => q.includes(ex.toLowerCase())) ||
-                        (q.includes('receita') && leg.recipeType.toLowerCase().includes(q)) ||
-                        (q.includes('portaria') && leg.title.toLowerCase().includes('344'));
+        const title = normalizeText(leg.title);
+        const isMatch = title.includes(q) || 
+                        leg.examples.some(ex => q.includes(normalizeText(ex))) ||
+                        (q.includes('receita') && normalizeText(leg.recipeType).includes(q)) ||
+                        (q.includes('portaria') && title.includes('344'));
         
         if (isMatch) {
           results.push(`### 📜 ${leg.title}\n**Tipo de Receita:** ${leg.recipeType}\n**Validade:** ${leg.validity}\n**Retenção:** ${leg.retention}\n\n**Exemplos:** ${leg.examples.join(', ')}\n**Notas:** ${leg.notes}`);
@@ -374,11 +422,12 @@ export default function App() {
       });
     }
 
-    // 3. Legacy Dosage Forms (Small enough for simple search)
+    // 3. Legacy Dosage Forms
     if (results.length === 0) {
       DOSAGE_FORMS.forEach(cat => {
         cat.items.forEach(item => {
-          if (item.name.toLowerCase().includes(q)) {
+          const itemName = normalizeText(item.name);
+          if (itemName.includes(q) || q.includes(itemName)) {
             results.push(`### 📦 Forma: ${item.name}\n**Descrição:** ${item.description}\n**Exemplos:** ${item.examples}`);
           }
         });
@@ -465,6 +514,12 @@ export default function App() {
     const prompt = `Calcule a posologia de ${calculator.medication} ${weightInfo}, com frequência de ${calculator.frequency}. Forneça a dose por administração e orientações de segurança.`;
     setInput(prompt);
     setCalculator({ medication: '', weight: '', frequency: '8h' });
+    if (window.innerWidth < 768) setShowReference(false);
+  };
+
+  const handleCheckLegislation = (title: string) => {
+    const prompt = `Quais as regras da Portaria 344/98 para ${title}? Explique o tipo de receita, validade e retenção.`;
+    setInput(prompt);
     if (window.innerWidth < 768) setShowReference(false);
   };
 
@@ -565,15 +620,30 @@ export default function App() {
               className="relative z-30 w-full md:w-80 lg:w-96 bg-white border-r border-slate-200 flex flex-col h-[38vh] md:h-full shadow-lg md:shadow-none shrink-0"
             >
               <div className="p-4 border-b border-slate-200 flex items-center justify-between bg-slate-50">
-                <div className={cn(
-                  "flex items-center gap-2",
-                  activeTab === 'forms' ? "text-emerald-700" : activeTab === 'interactions' ? "text-orange-700" : activeTab === 'posology' ? "text-blue-700" : activeTab === 'featured' ? "text-purple-700" : "text-rose-700"
-                )}>
-                  {activeTab === 'forms' ? <LayoutGrid className="w-5 h-5" /> : activeTab === 'interactions' ? <AlertTriangle className="w-5 h-5" /> : activeTab === 'posology' ? <ClipboardList className="w-5 h-5" /> : activeTab === 'featured' ? <Star className="w-5 h-5" /> : <Stethoscope className="w-5 h-5" />}
-                  <h2 className="font-bold text-sm sm:text-base">
-                    {activeTab === 'forms' ? 'Formas Farmacêuticas' : activeTab === 'interactions' ? 'Guia de Interações' : activeTab === 'posology' ? 'Guia de Posologia' : activeTab === 'featured' ? 'Medicamentos em Destaque' : 'Busca por Sintomas'}
-                  </h2>
-                </div>
+                  <div className={cn(
+                    "flex items-center gap-2",
+                    activeTab === 'forms' ? "text-emerald-700" : 
+                    activeTab === 'interactions' ? "text-orange-700" : 
+                    activeTab === 'posology' ? "text-blue-700" : 
+                    activeTab === 'featured' ? "text-purple-700" : 
+                    activeTab === 'symptoms' ? "text-rose-700" :
+                    "text-slate-700"
+                  )}>
+                    {activeTab === 'forms' ? <LayoutGrid className="w-5 h-5" /> : 
+                     activeTab === 'interactions' ? <AlertTriangle className="w-5 h-5" /> : 
+                     activeTab === 'posology' ? <ClipboardList className="w-5 h-5" /> : 
+                     activeTab === 'featured' ? <Star className="w-5 h-5" /> : 
+                     activeTab === 'symptoms' ? <Stethoscope className="w-5 h-5" /> :
+                     <Gavel className="w-5 h-5" />}
+                    <h2 className="font-bold text-sm sm:text-base">
+                      {activeTab === 'forms' ? 'Formas Farmacêuticas' : 
+                       activeTab === 'interactions' ? 'Guia de Interações' : 
+                       activeTab === 'posology' ? 'Guia de Posologia' : 
+                       activeTab === 'featured' ? 'Medicamentos em Destaque' : 
+                       activeTab === 'symptoms' ? 'Busca por Sintomas' :
+                       'Legislação e Receitas'}
+                    </h2>
+                  </div>
                 <button 
                   onClick={() => setShowReference(false)}
                   className="p-2 hover:bg-slate-200 rounded-full transition-colors"
@@ -628,6 +698,15 @@ export default function App() {
                     )}
                   >
                     Sintomas
+                  </button>
+                  <button 
+                    onClick={() => setActiveTab('legislation')}
+                    className={cn(
+                      "flex-1 min-w-[80px] py-3 text-[10px] font-bold uppercase tracking-wider transition-all border-b-2",
+                      activeTab === 'legislation' ? "border-slate-600 text-slate-700 bg-slate-50" : "border-transparent text-slate-400 hover:text-slate-600"
+                    )}
+                  >
+                    Legislação
                   </button>
                 </div>
 
@@ -754,11 +833,11 @@ export default function App() {
                       </div>
                       <button 
                         onClick={handleCalculate}
-                        disabled={!calculator.medication || !isOnline}
+                        disabled={!calculator.medication}
                         className="w-full bg-blue-600 hover:bg-blue-700 disabled:bg-slate-700 py-2 rounded-lg text-xs font-bold transition-all flex items-center justify-center gap-2 mt-2"
                       >
                         <Calculator className="w-3 h-3" />
-                        {isOnline ? 'Calcular Posologia' : 'Cálculo Requer Internet'}
+                        {isOnline ? 'Calcular com IA' : 'Consultar Offline'}
                       </button>
                     </div>
                   </div>
@@ -789,7 +868,7 @@ export default function App() {
                       />
                       <button 
                         onClick={handleCheckPosology}
-                        disabled={!posologySearch || !isOnline}
+                        disabled={!posologySearch}
                         className="bg-slate-700 hover:bg-slate-600 disabled:opacity-50 p-2 rounded-lg transition-all"
                       >
                         <Search className="w-4 h-4" />
@@ -861,6 +940,74 @@ export default function App() {
                             </div>
                           </div>
                         ))}
+                      </div>
+                    </div>
+                  ))}
+                </div>
+              ) : activeTab === 'legislation' ? (
+                <div className="space-y-6">
+                  {/* Legislation Search Tool */}
+                  <div className="bg-slate-800 rounded-xl p-4 text-white shadow-lg">
+                    <div className="flex items-center gap-2 mb-3">
+                      <Scale className="w-4 h-4 text-slate-400" />
+                      <h3 className="text-xs font-bold uppercase tracking-wider text-slate-100">Consulta de Portarias</h3>
+                    </div>
+                    <div className="space-y-3">
+                      <input 
+                        type="text" 
+                        placeholder="Ex: 344, Receita Azul, Sibutramina..."
+                        value={legislationSearch}
+                        onChange={(e) => setLegislationSearch(e.target.value)}
+                        className="w-full bg-white/10 border border-white/20 rounded-lg px-3 py-2 text-xs focus:outline-none focus:ring-2 focus:ring-slate-500/50 placeholder:text-white/40"
+                      />
+                    </div>
+                  </div>
+
+                  {/* Legislation List */}
+                  {OFFLINE_LEGISLATION.filter(leg => 
+                    leg.title.toLowerCase().includes(legislationSearch.toLowerCase()) ||
+                    leg.recipeType.toLowerCase().includes(legislationSearch.toLowerCase()) ||
+                    leg.examples.some(ex => ex.toLowerCase().includes(legislationSearch.toLowerCase()))
+                  ).map((leg, i) => (
+                    <div key={i} className="p-4 rounded-xl border border-slate-100 bg-white hover:border-slate-300 transition-all shadow-sm group">
+                      <div className="flex items-start justify-between gap-2">
+                        <h3 className="text-sm font-bold text-slate-800 leading-tight">{leg.title}</h3>
+                        <button 
+                          onClick={() => handleCheckLegislation(leg.title)}
+                          className="p-1.5 text-slate-400 hover:text-blue-600 hover:bg-blue-50 rounded-lg transition-all opacity-0 group-hover:opacity-100"
+                          title="Perguntar à IA sobre esta portaria"
+                        >
+                          <Sparkles className="w-3.5 h-3.5" />
+                        </button>
+                      </div>
+                      
+                      <div className="mt-3 grid grid-cols-2 gap-2">
+                        <div className="bg-slate-50 p-2 rounded-lg">
+                          <p className="text-[9px] font-bold text-slate-400 uppercase tracking-tighter">Receita</p>
+                          <p className="text-[10px] font-medium text-slate-700 leading-tight">{leg.recipeType}</p>
+                        </div>
+                        <div className="bg-slate-50 p-2 rounded-lg">
+                          <p className="text-[9px] font-bold text-slate-400 uppercase tracking-tighter">Validade</p>
+                          <p className="text-[10px] font-medium text-slate-700 leading-tight">{leg.validity}</p>
+                        </div>
+                      </div>
+
+                      <div className="mt-3 space-y-2">
+                        <div>
+                          <p className="text-[9px] font-bold text-slate-400 uppercase tracking-tighter mb-1">Exemplos</p>
+                          <div className="flex flex-wrap gap-1">
+                            {leg.examples.map((ex, j) => (
+                              <span key={j} className="text-[9px] px-1.5 py-0.5 bg-white border border-slate-200 text-slate-600 rounded">
+                                {ex}
+                              </span>
+                            ))}
+                          </div>
+                        </div>
+                        <div className="pt-2 border-t border-slate-50">
+                          <p className="text-[10px] text-slate-500 italic leading-relaxed">
+                            <span className="font-bold not-italic text-slate-400">Retenção:</span> {leg.retention}
+                          </p>
+                        </div>
                       </div>
                     </div>
                   ))}

@@ -236,6 +236,50 @@ export const OFFLINE_MEDS: Medication[] = [
     contraindications: ['Uso de IMAOs', 'Hipersensibilidade.'],
     sideEffects: ['Náuseas', 'Insônia', 'Disfunção sexual'],
     notes: 'Medicamento controlado (Receita C1 Branca). Efeito demora 2-4 semanas.'
+  },
+  {
+    name: 'Metronidazol',
+    class: 'Anti-infeccioso / Antibiótico',
+    indication: 'Infecções por protozoários e bactérias anaeróbias.',
+    dosageAdult: '250mg a 500mg a cada 8 ou 12 horas.',
+    dosageChild: '30-40mg/kg/dia divididos em 3 doses.',
+    interactions: ['Álcool (Efeito Antabuse)', 'Varfarina', 'Lítio'],
+    contraindications: ['Hipersensibilidade', 'Primeiro trimestre de gravidez.'],
+    sideEffects: ['Gosto metálico', 'Náuseas', 'Urina escura'],
+    notes: 'NÃO consumir álcool durante e até 48h após o tratamento.'
+  },
+  {
+    name: 'Ciprofloxacino',
+    class: 'Antibiótico (Quinolona)',
+    indication: 'Infecções urinárias graves, respiratórias e gastrointestinais.',
+    dosageAdult: '250mg a 750mg a cada 12 horas.',
+    dosageChild: 'Uso restrito (risco articular). Sob orientação médica.',
+    interactions: ['Antiácidos (espaçar 2h)', 'Teofilina', 'Varfarina'],
+    contraindications: ['Hipersensibilidade a quinolonas', 'Uso com tizanidina.'],
+    sideEffects: ['Náuseas', 'Diarreia', 'Risco de ruptura de tendão (raro)'],
+    notes: 'Evitar exposição solar excessiva durante o uso.'
+  },
+  {
+    name: 'Dexametasona',
+    class: 'Corticosteroide potente',
+    indication: 'Inflamações graves, alergias, edema cerebral.',
+    dosageAdult: '0.75mg a 9mg por dia.',
+    dosageChild: '0.02 a 0.3mg/kg/dia.',
+    interactions: ['Antidiabéticos', 'AINEs', 'Fenitoína'],
+    contraindications: ['Infecções sistêmicas não controladas.'],
+    sideEffects: ['Retenção de líquidos', 'Aumento da pressão', 'Glicemia alta'],
+    notes: 'Potência muito superior à prednisona.'
+  },
+  {
+    name: 'Glibenclamida',
+    class: 'Antidiabético (Sulfonilureia)',
+    indication: 'Diabetes Mellitus Tipo 2.',
+    dosageAdult: '2.5mg a 20mg por dia.',
+    dosageChild: 'Não recomendado.',
+    interactions: ['Álcool', 'AINEs', 'Miconazol'],
+    contraindications: ['Diabetes Tipo 1', 'Cetoacidose', 'Insuficiência renal/hepática.'],
+    sideEffects: ['Hipoglicemia (suor frio, tremor)', 'Aumento de peso'],
+    notes: 'Risco de hipoglicemia prolongada em idosos.'
   }
 ];
 

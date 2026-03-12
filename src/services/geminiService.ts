@@ -2,7 +2,7 @@ import { GoogleGenAI, Type } from "@google/genai";
 
 const getApiKey = () => {
   const key = process.env.GEMINI_API_KEY;
-  if (!key || key === "MY_GEMINI_API_KEY" || key === "") {
+  if (!key || key === "MY_GEMINI_API_KEY" || key === "" || key.includes("TODO")) {
     return null;
   }
   return key;
