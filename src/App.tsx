@@ -195,6 +195,10 @@ const SYMPTOMS_DATA = [
   }
 ];
 
+import { GoogleGenAI, Type, GenerateContentResponse } from "@google/genai";
+
+const ai = new GoogleGenAI({ apiKey: process.env.GEMINI_API_KEY || "" });
+
 const SEARCH_SUGGESTIONS = [
   'Amoxicilina',
   'Paracetamol posologia',
@@ -229,6 +233,8 @@ export default function App() {
   const [isOnline, setIsOnline] = useState(navigator.onLine);
   const [filteredSuggestions, setFilteredSuggestions] = useState<string[]>([]);
   const [showSuggestions, setShowSuggestions] = useState(false);
+  const [logoUrl, setLogoUrl] = useState<string | null>(null);
+  const [isGeneratingLogo, setIsGeneratingLogo] = useState(false);
   const scrollRef = useRef<HTMLDivElement>(null);
 
   useEffect(() => {
@@ -277,6 +283,38 @@ export default function App() {
     }
   };
 
+  const generateLogo = async () => {
+    setIsGeneratingLogo(true);
+    try {
+      const response = await ai.models.generateContent({
+        model: 'gemini-2.5-flash-image',
+        contents: {
+          parts: [
+            {
+              text: 'A professional, modern, minimalist logo for a pharmacy AI application named "PharmaWise AI". The logo should feature a stylized mortar and pestle or a cross combined with a brain or digital circuit pattern. Colors: Emerald green, slate, and white. Clean lines, high resolution, professional branding style.',
+            },
+          ],
+        },
+      });
+
+      for (const part of response.candidates?.[0]?.content?.parts || []) {
+        if (part.inlineData) {
+          const base64EncodeString = part.inlineData.data;
+          setLogoUrl(`data:image/png;base64,${base64EncodeString}`);
+          break;
+        }
+      }
+    } catch (error) {
+      console.error("Error generating logo:", error);
+    } finally {
+      setIsGeneratingLogo(false);
+    }
+  };
+
+  useEffect(() => {
+    generateLogo();
+  }, []);
+
   const handleCheckInteraction = () => {
     if (!checker.drugA || !checker.drugB || !isOnline) return;
     const prompt = `Quais as interações medicamentosas entre ${checker.drugA} e ${checker.drugB}? Indique o nível de risco e descreva o efeito.`;
@@ -314,15 +352,21 @@ export default function App() {
       {/* Header */}
       <header className="bg-white border-b border-slate-200 px-6 py-4 flex items-center justify-between sticky top-0 z-10 shadow-sm">
         <div className="flex items-center gap-3">
-          <div className="bg-emerald-600 p-2 rounded-xl">
-            <Pill className="text-white w-6 h-6" />
+          <div className="w-10 h-10 bg-emerald-600 rounded-xl flex items-center justify-center shadow-lg shadow-emerald-200 overflow-hidden">
+            {logoUrl ? (
+              <img src={logoUrl} alt="PharmaWise Logo" className="w-full h-full object-cover" referrerPolicy="no-referrer" />
+            ) : isGeneratingLogo ? (
+              <Loader2 className="w-6 h-6 text-white animate-spin" />
+            ) : (
+              <Pill className="text-white w-6 h-6" />
+            )}
           </div>
           <div>
-            <h1 className="text-xl font-bold tracking-tight text-slate-800">PharmaWise AI</h1>
+            <h1 className="text-xl font-bold tracking-tight text-slate-800">PharmaWise <span className="text-emerald-600">AI</span></h1>
             <p className="text-xs text-slate-500 font-medium uppercase tracking-wider">Assistente de Dispensação</p>
           </div>
         </div>
-        <div className="flex items-center gap-4">
+        <div className="flex items-center gap-2 md:gap-4">
           <button 
             onClick={() => {
               setShowReference(!showReference);
@@ -330,91 +374,17 @@ export default function App() {
             }}
             className={cn(
               "flex items-center gap-2 px-3 py-1.5 rounded-lg text-sm font-medium transition-all",
-              showReference && activeTab === 'forms'
+              showReference
                 ? "bg-emerald-600 text-white shadow-md shadow-emerald-200" 
                 : "bg-slate-100 text-slate-600 hover:bg-slate-200"
             )}
           >
             <BookOpen className="w-4 h-4" />
-            <span className="hidden sm:inline">Guia</span>
+            <span className="hidden md:inline">Guias de Referência</span>
+            <span className="md:hidden">Guias</span>
           </button>
-          <button 
-            onClick={() => {
-              if (showReference && activeTab === 'interactions') {
-                setShowReference(false);
-              } else {
-                setShowReference(true);
-                setActiveTab('interactions');
-              }
-            }}
-            className={cn(
-              "flex items-center gap-2 px-3 py-1.5 rounded-lg text-sm font-medium transition-all",
-              showReference && activeTab === 'interactions'
-                ? "bg-orange-600 text-white shadow-md shadow-orange-200" 
-                : "bg-slate-100 text-slate-600 hover:bg-slate-200"
-            )}
-          >
-            <AlertTriangle className="w-4 h-4" />
-            <span className="hidden sm:inline">Interações</span>
-          </button>
-          <button 
-            onClick={() => {
-              if (showReference && activeTab === 'posology') {
-                setShowReference(false);
-              } else {
-                setShowReference(true);
-                setActiveTab('posology');
-              }
-            }}
-            className={cn(
-              "flex items-center gap-2 px-3 py-1.5 rounded-lg text-sm font-medium transition-all",
-              showReference && activeTab === 'posology'
-                ? "bg-blue-600 text-white shadow-md shadow-blue-200" 
-                : "bg-slate-100 text-slate-600 hover:bg-slate-200"
-            )}
-          >
-            <ClipboardList className="w-4 h-4" />
-            <span className="hidden sm:inline">Posologia</span>
-          </button>
-          <button 
-            onClick={() => {
-              if (showReference && activeTab === 'featured') {
-                setShowReference(false);
-              } else {
-                setShowReference(true);
-                setActiveTab('featured');
-              }
-            }}
-            className={cn(
-              "flex items-center gap-2 px-3 py-1.5 rounded-lg text-sm font-medium transition-all",
-              showReference && activeTab === 'featured'
-                ? "bg-purple-600 text-white shadow-md shadow-purple-200" 
-                : "bg-slate-100 text-slate-600 hover:bg-slate-200"
-            )}
-          >
-            <Star className="w-4 h-4" />
-            <span className="hidden sm:inline">Destaques</span>
-          </button>
-          <button 
-            onClick={() => {
-              if (showReference && activeTab === 'symptoms') {
-                setShowReference(false);
-              } else {
-                setShowReference(true);
-                setActiveTab('symptoms');
-              }
-            }}
-            className={cn(
-              "flex items-center gap-2 px-3 py-1.5 rounded-lg text-sm font-medium transition-all",
-              showReference && activeTab === 'symptoms'
-                ? "bg-rose-600 text-white shadow-md shadow-rose-200" 
-                : "bg-slate-100 text-slate-600 hover:bg-slate-200"
-            )}
-          >
-            <Stethoscope className="w-4 h-4" />
-            <span className="hidden sm:inline">Sintomas</span>
-          </button>
-          <div className="hidden md:flex items-center gap-2 text-emerald-700 bg-emerald-50 px-3 py-1.5 rounded-full border border-emerald-100">
+          
+          <div className="hidden lg:flex items-center gap-2 text-emerald-700 bg-emerald-50 px-3 py-1.5 rounded-full border border-emerald-100">
             <ShieldCheck className="w-4 h-4" />
             <span className="text-xs font-semibold">Baseado em Evidências</span>
           </div>
@@ -425,61 +395,40 @@ export default function App() {
               : "bg-amber-50 text-amber-700 border-amber-100"
           )}>
             {isOnline ? <Wifi className="w-3.5 h-3.5" /> : <WifiOff className="w-3.5 h-3.5" />}
-            <span>{isOnline ? 'Online' : 'Modo Offline'}</span>
+            <span className="hidden sm:inline">{isOnline ? 'Online' : 'Modo Offline'}</span>
           </div>
         </div>
       </header>
 
       {/* Main Content */}
       <main className="flex-1 overflow-hidden flex flex-col md:flex-row max-w-7xl mx-auto w-full relative">
-        {/* Reference Sidebar (Mobile Overlay / Desktop Side) */}
+        {/* Reference Sidebar */}
         <AnimatePresence>
           {showReference && (
-            <>
-              {/* Backdrop for mobile */}
-              <motion.div 
-                initial={{ opacity: 0 }}
-                animate={{ opacity: 1 }}
-                exit={{ opacity: 0 }}
-                onClick={() => setShowReference(false)}
-                className="absolute inset-0 bg-slate-900/40 backdrop-blur-sm z-20 md:hidden"
-              />
-              
-              <motion.div 
-                initial={{ x: '-100%' }}
-                animate={{ x: 0 }}
-                exit={{ x: '-100%' }}
-                drag="x"
-                dragConstraints={{ left: -100, right: 0 }}
-                dragElastic={0.1}
-                onDragEnd={(_, info) => {
-                  if (info.offset.x < -50) {
-                    setShowReference(false);
-                  }
-                }}
-                transition={{ type: 'spring', damping: 25, stiffness: 200 }}
-                className="absolute inset-y-0 left-0 z-30 w-[85%] sm:w-80 lg:w-96 bg-white border-r border-slate-200 flex flex-col shadow-2xl md:shadow-none md:relative md:inset-auto"
-              >
-                <div className="p-4 border-b border-slate-200 flex items-center justify-between bg-slate-50 relative">
-                  {/* Swipe handle indicator for mobile */}
-                  <div className="absolute right-0 top-1/2 -translate-y-1/2 w-1 h-12 bg-slate-200 rounded-l-full md:hidden" />
-                  
-                  <div className={cn(
-                    "flex items-center gap-2",
-                    activeTab === 'forms' ? "text-emerald-700" : activeTab === 'interactions' ? "text-orange-700" : activeTab === 'posology' ? "text-blue-700" : activeTab === 'featured' ? "text-purple-700" : "text-rose-700"
-                  )}>
-                    {activeTab === 'forms' ? <LayoutGrid className="w-5 h-5" /> : activeTab === 'interactions' ? <AlertTriangle className="w-5 h-5" /> : activeTab === 'posology' ? <ClipboardList className="w-5 h-5" /> : activeTab === 'featured' ? <Star className="w-5 h-5" /> : <Stethoscope className="w-5 h-5" />}
-                    <h2 className="font-bold text-sm sm:text-base">
-                      {activeTab === 'forms' ? 'Formas Farmacêuticas' : activeTab === 'interactions' ? 'Guia de Interações' : activeTab === 'posology' ? 'Guia de Posologia' : activeTab === 'featured' ? 'Medicamentos em Destaque' : 'Busca por Sintomas'}
-                    </h2>
-                  </div>
-                  <button 
-                    onClick={() => setShowReference(false)}
-                    className="p-2 hover:bg-slate-200 rounded-full transition-colors"
-                  >
-                    <ChevronLeft className="w-5 h-5 text-slate-500" />
-                  </button>
+            <motion.div 
+              initial={{ x: '-100%', opacity: 0 }}
+              animate={{ x: 0, opacity: 1 }}
+              exit={{ x: '-100%', opacity: 0 }}
+              transition={{ type: 'spring', damping: 25, stiffness: 200 }}
+              className="relative z-30 w-full md:w-80 lg:w-96 bg-white border-r border-slate-200 flex flex-col h-[38vh] md:h-full shadow-lg md:shadow-none shrink-0"
+            >
+              <div className="p-4 border-b border-slate-200 flex items-center justify-between bg-slate-50">
+                <div className={cn(
+                  "flex items-center gap-2",
+                  activeTab === 'forms' ? "text-emerald-700" : activeTab === 'interactions' ? "text-orange-700" : activeTab === 'posology' ? "text-blue-700" : activeTab === 'featured' ? "text-purple-700" : "text-rose-700"
+                )}>
+                  {activeTab === 'forms' ? <LayoutGrid className="w-5 h-5" /> : activeTab === 'interactions' ? <AlertTriangle className="w-5 h-5" /> : activeTab === 'posology' ? <ClipboardList className="w-5 h-5" /> : activeTab === 'featured' ? <Star className="w-5 h-5" /> : <Stethoscope className="w-5 h-5" />}
+                  <h2 className="font-bold text-sm sm:text-base">
+                    {activeTab === 'forms' ? 'Formas Farmacêuticas' : activeTab === 'interactions' ? 'Guia de Interações' : activeTab === 'posology' ? 'Guia de Posologia' : activeTab === 'featured' ? 'Medicamentos em Destaque' : 'Busca por Sintomas'}
+                  </h2>
                 </div>
+                <button 
+                  onClick={() => setShowReference(false)}
+                  className="p-2 hover:bg-slate-200 rounded-full transition-colors"
+                >
+                  <X className="w-5 h-5 text-slate-500" />
+                </button>
+              </div>
 
                 {/* Tabs inside sidebar */}
                 <div className="flex border-b border-slate-100 overflow-x-auto no-scrollbar">
@@ -813,29 +762,15 @@ export default function App() {
               )}
             </div>
           </motion.div>
-        </>
-      )}
-    </AnimatePresence>
+        )}
+      </AnimatePresence>
 
         {/* Chat Area Container */}
         <div className="flex-1 flex flex-col overflow-hidden relative">
-          {/* Mobile Reference FAB */}
-          {!showReference && (
-            <motion.button
-              initial={{ scale: 0, opacity: 0 }}
-              animate={{ scale: 1, opacity: 1 }}
-              whileTap={{ scale: 0.9 }}
-              onClick={() => setShowReference(true)}
-              className="absolute bottom-24 right-6 z-10 p-4 bg-emerald-600 text-white rounded-full shadow-lg md:hidden flex items-center justify-center"
-            >
-              <BookOpen className="w-6 h-6" />
-            </motion.button>
-          )}
-
           {/* Chat Area */}
           <div 
             ref={scrollRef}
-            className="flex-1 overflow-y-auto p-6 space-y-6 scroll-smooth"
+            className="flex-1 overflow-y-auto p-4 md:p-6 space-y-6 scroll-smooth pb-32 md:pb-6"
           >
           {messages.map((msg, idx) => (
             <div 
@@ -852,7 +787,7 @@ export default function App() {
                 {msg.role === 'user' ? <User className="w-5 h-5" /> : <Bot className="w-5 h-5" />}
               </div>
               <div className={cn(
-                "p-4 rounded-2xl shadow-sm",
+                "p-3 md:p-4 rounded-2xl shadow-sm",
                 msg.role === 'user' 
                   ? "bg-emerald-600 text-white rounded-tr-none" 
                   : "bg-white border border-slate-200 rounded-tl-none"
@@ -879,15 +814,15 @@ export default function App() {
         </div>
 
         {/* Quick Actions & Input Area */}
-        <div className="p-6 bg-white border-t border-slate-200 space-y-4">
+        <div className="p-4 md:p-6 bg-white border-t border-slate-200 space-y-4">
           {/* Quick Actions */}
           {messages.length < 3 && (
-            <div className="flex flex-wrap gap-2">
+            <div className="flex overflow-x-auto no-scrollbar gap-2 pb-2 -mx-2 px-2 md:flex-wrap md:overflow-visible md:pb-0 md:mx-0 md:px-0">
               {quickActions.map((action, i) => (
                 <button
                   key={i}
                   onClick={() => setInput(action.prompt)}
-                  className="flex items-center gap-2 px-4 py-2 bg-slate-50 hover:bg-slate-100 border border-slate-200 rounded-full text-sm font-medium text-slate-600 transition-colors"
+                  className="flex items-center gap-2 px-4 py-2 bg-slate-50 hover:bg-slate-100 border border-slate-200 rounded-full text-xs md:text-sm font-medium text-slate-600 transition-colors shrink-0 md:shrink"
                 >
                   <action.icon className="w-4 h-4" />
                   {action.label}
