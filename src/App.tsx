@@ -36,6 +36,14 @@ import { motion, AnimatePresence } from 'motion/react';
 import { clsx, type ClassValue } from 'clsx';
 import { twMerge } from 'tailwind-merge';
 import { askPharmaAI } from './services/geminiService';
+import { 
+  OFFLINE_MEDS, 
+  OFFLINE_INTERACTIONS, 
+  OFFLINE_SYMPTOMS,
+  Medication,
+  Interaction,
+  SymptomGuide
+} from './data/offlineDatabase';
 
 function cn(...inputs: ClassValue[]) {
   return twMerge(clsx(inputs));
@@ -270,12 +278,15 @@ export default function App() {
     setMessages(prev => [...prev, { role: 'user', content: userMessage }]);
     setIsLoading(true);
 
-    if (!isOnline) {
+    // Check offline database first for direct matches
+    const offlineResponse = searchOffline(userMessage);
+    const isDirectMatch = !offlineResponse.includes('Sinto muito, não encontrei');
+
+    if (!isOnline || isDirectMatch) {
       setTimeout(() => {
-        const offlineResponse = searchOffline(userMessage);
         setMessages(prev => [...prev, { role: 'assistant', content: offlineResponse }]);
         setIsLoading(false);
-      }, 800);
+      }, 600);
       return;
     }
 
@@ -305,49 +316,53 @@ export default function App() {
   };
 
   const searchOffline = (query: string): string => {
-    const q = query.toLowerCase();
+    const q = query.toLowerCase().trim();
     let results: string[] = [];
 
-    // Search in Dosages
-    COMMON_DOSAGES.forEach(cat => {
-      cat.items.forEach(item => {
-        if (item.name.toLowerCase().includes(q)) {
-          results.push(`**${item.name} (Posologia)**\n- Adulto: ${item.adult}\n- Criança: ${item.child}\n- Nota: ${item.note}`);
-        }
-      });
-    });
-
-    // Search in Interactions
-    COMMON_INTERACTIONS.forEach(level => {
-      level.items.forEach(item => {
-        if (item.drugs.toLowerCase().includes(q)) {
-          results.push(`**Interação: ${item.drugs}**\n- Nível: ${level.level}\n- Efeito: ${item.effect}\n- Risco: ${item.risk}`);
-        }
-      });
-    });
-
-    // Search in Symptoms
-    SYMPTOMS_DATA.forEach(data => {
-      if (data.symptom.toLowerCase().includes(q)) {
-        const meds = data.medications.map(m => `- **${m.name}** (${m.class}): ${m.note}`).join('\n');
-        results.push(`**Sintoma: ${data.symptom}**\nMedicamentos sugeridos:\n${meds}`);
+    // 1. Search in Expanded Medication Database
+    OFFLINE_MEDS.forEach(med => {
+      if (med.name.toLowerCase().includes(q) || q.includes(med.name.toLowerCase())) {
+        results.push(`### 💊 ${med.name}\n**Classe:** ${med.class}\n**Indicação:** ${med.indication}\n\n**Posologia:**\n- Adulto: ${med.dosageAdult}\n- Criança: ${med.dosageChild}\n\n**Interações:** ${med.interactions.join(', ')}\n**Contraindicações:** ${med.contraindications.join(', ')}\n**Efeitos Colaterais:** ${med.sideEffects.join(', ')}\n\n**Notas Técnicas:** ${med.notes}`);
       }
     });
 
-    // Search in Dosage Forms
+    // 2. Search in Expanded Interactions
+    OFFLINE_INTERACTIONS.forEach(item => {
+      if (item.drugs.toLowerCase().includes(q) || q.includes('interação') && (item.drugs.toLowerCase().split(' + ').some(d => q.includes(d.toLowerCase())))) {
+        results.push(`### ⚠️ Interação: ${item.drugs}\n**Nível:** ${item.level}\n**Efeito:** ${item.effect}\n**Risco:** ${item.risk}`);
+      }
+    });
+
+    // 3. Search in Expanded Symptoms
+    OFFLINE_SYMPTOMS.forEach(data => {
+      if (data.symptom.toLowerCase().includes(q) || q.includes(data.symptom.toLowerCase())) {
+        const meds = data.recommendations.map(m => `- **${m.name}** (${m.class}): ${m.note}`).join('\n');
+        results.push(`### 🌡️ Guia para: ${data.symptom}\n**Medicamentos sugeridos:**\n${meds}`);
+      }
+    });
+
+    // 4. Search in Dosage Forms (Legacy support)
     DOSAGE_FORMS.forEach(cat => {
       cat.items.forEach(item => {
         if (item.name.toLowerCase().includes(q)) {
-          results.push(`**Forma Farmacêutica: ${item.name}**\n- Descrição: ${item.description}\n- Exemplos: ${item.examples}`);
+          results.push(`### 📦 Forma: ${item.name}\n**Descrição:** ${item.description}\n**Exemplos:** ${item.examples}`);
         }
       });
     });
 
     if (results.length > 0) {
-      return `### Resultados da Busca Offline (Base de Dados Local)\n\nEncontrei as seguintes informações na minha base de dados local para "**${query}**":\n\n${results.join('\n\n---\n\n')}\n\n*Nota: Como você está offline, estou usando apenas minha base de dados de referência local. Para uma análise completa com IA, conecte-se à internet.*`;
+      const header = isOnline 
+        ? `### 📚 Informação do Banco de Dados Local\n\nEncontrei informações precisas no meu banco de dados offline para "**${query}**":\n\n`
+        : `### 📡 Modo Offline Ativo\n\nExibindo resultados do banco de dados local para "**${query}**":\n\n`;
+      
+      return `${header}${results.join('\n\n---\n\n')}\n\n*Nota: Esta resposta foi gerada a partir do banco de dados de segurança local. Para dúvidas mais complexas, a IA (Gemini) pode ser consultada quando houver conexão.*`;
     }
 
-    return `Sinto muito, não encontrei informações específicas sobre "**${query}**" na minha base de dados offline.\n\nComo estou **offline**, minha capacidade de resposta está limitada à base de dados local pré-carregada. Por favor, conecte-se à internet para usar todo o poder da inteligência artificial do PharmaWise AI.`;
+    if (!isOnline) {
+      return `### 📡 Modo Offline\n\nSinto muito, não encontrei informações específicas sobre "**${query}**" no meu banco de dados local.\n\nComo você está **offline**, não consigo consultar a inteligência artificial completa. Por favor, tente termos mais simples ou conecte-se à internet.`;
+    }
+
+    return `Sinto muito, não encontrei no banco offline.`; // This will trigger the Gemini fallback in handleSend
   };
 
   const generateLogo = async () => {
