@@ -137,6 +137,157 @@ export const OFFLINE_MEDS: Medication[] = [
     contraindications: ['Gravidez', 'Insuficiência hepática grave.'],
     sideEffects: ['Tontura', 'Hipotensão', 'Hipercalemia'],
     notes: 'Monitorar níveis de potássio e função renal.'
+  },
+  {
+    name: 'Atenolol',
+    class: 'Anti-hipertensivo (Betabloqueador)',
+    indication: 'Hipertensão, arritmias, angina.',
+    dosageAdult: '25mg a 100mg uma vez ao dia.',
+    dosageChild: 'Sob orientação médica.',
+    interactions: ['Verapamil', 'Diltiazem', 'Insulina'],
+    contraindications: ['Bradicardia acentuada', 'Choque cardiogênico', 'Asma grave.'],
+    sideEffects: ['Fadiga', 'Mãos e pés frios', 'Batimentos lentos'],
+    notes: 'Não interromper o uso bruscamente.'
+  },
+  {
+    name: 'Enalapril',
+    class: 'Anti-hipertensivo (IECA)',
+    indication: 'Hipertensão arterial, insuficiência cardíaca.',
+    dosageAdult: '5mg a 40mg por dia (1 ou 2 doses).',
+    dosageChild: '0.08mg/kg/dia.',
+    interactions: ['Diuréticos poupadores de potássio', 'Lítio', 'AINEs'],
+    contraindications: ['Histórico de angioedema', 'Gravidez.'],
+    sideEffects: ['Tosse seca persistente', 'Tontura', 'Cefaleia'],
+    notes: 'A tosse seca é um efeito colateral comum desta classe.'
+  },
+  {
+    name: 'Hidroclorotiazida',
+    class: 'Diurético Tiazídico',
+    indication: 'Hipertensão, edema (inchaço).',
+    dosageAdult: '12.5mg a 50mg uma vez ao dia.',
+    dosageChild: '1-2mg/kg/dia.',
+    interactions: ['Lítio', 'Digoxina', 'Antidiabéticos'],
+    contraindications: ['Anúria', 'Hipersensibilidade a sulfonamidas.'],
+    sideEffects: ['Hipopotassemia', 'Aumento do ácido úrico', 'Fotossensibilidade'],
+    notes: 'Tomar preferencialmente pela manhã para evitar micção noturna.'
+  },
+  {
+    name: 'Prednisona',
+    class: 'Corticosteroide (Anti-inflamatório)',
+    indication: 'Alergias graves, doenças autoimunes, inflamações.',
+    dosageAdult: '5mg a 60mg por dia.',
+    dosageChild: '0.1 a 2mg/kg/dia.',
+    interactions: ['Antidiabéticos', 'AINEs', 'Vacinas de vírus vivos'],
+    contraindications: ['Infecções fúngicas sistêmicas', 'Hipersensibilidade.'],
+    sideEffects: ['Aumento de peso', 'Insônia', 'Aumento da glicemia', 'Osteoporose (uso longo)'],
+    notes: 'Uso prolongado exige desmame gradual. Tomar pela manhã.'
+  },
+  {
+    name: 'Cefalexina',
+    class: 'Antibiótico (Cefalosporina)',
+    indication: 'Infecções de pele, urinárias, respiratórias.',
+    dosageAdult: '250mg a 500mg a cada 6 horas.',
+    dosageChild: '25-50mg/kg/dia divididos em 4 doses.',
+    interactions: ['Probenecida', 'Metformina'],
+    contraindications: ['Alergia a cefalosporinas ou penicilinas.'],
+    sideEffects: ['Diarreia', 'Náuseas', 'Urticária'],
+    notes: 'Pode ser tomado com alimentos se causar desconforto gástrico.'
+  },
+  {
+    name: 'Fluconazol',
+    class: 'Antifúngico',
+    indication: 'Candidíase, micoses de pele e unha.',
+    dosageAdult: '150mg dose única (candidíase vaginal) ou semanal.',
+    dosageChild: '3-12mg/kg conforme indicação.',
+    interactions: ['Varfarina', 'Fenitoína', 'Rifampicina'],
+    contraindications: ['Hipersensibilidade', 'Uso com terfenadina.'],
+    sideEffects: ['Dor abdominal', 'Náuseas', 'Alteração no paladar'],
+    notes: 'Dose única costuma ser suficiente para candidíase vaginal simples.'
+  },
+  {
+    name: 'Salbutamol',
+    class: 'Broncodilatador',
+    indication: 'Asma, bronquite, falta de ar.',
+    dosageAdult: '100-200mcg (1-2 jatos) até 4x ao dia.',
+    dosageChild: '100mcg (1 jato) até 4x ao dia.',
+    interactions: ['Betabloqueadores', 'Diuréticos'],
+    contraindications: ['Hipersensibilidade', 'Ameaça de aborto.'],
+    sideEffects: ['Tremores', 'Taquicardia', 'Cefaleia'],
+    notes: 'Uso inalatório (bombinha) tem ação rápida.'
+  },
+  {
+    name: 'Clonazepam',
+    class: 'Benzodiazepínico (Psicotrópico - B1)',
+    indication: 'Ansiedade, distúrbios do sono, crises epilépticas.',
+    dosageAdult: '0.5mg a 6mg por dia (dividido).',
+    dosageChild: '0.01-0.03mg/kg/dia.',
+    interactions: ['Álcool', 'Opioides', 'Outros depressores do SNC'],
+    contraindications: ['Glaucoma de ângulo fechado', 'Insuficiência respiratória grave.'],
+    sideEffects: ['Sonolência', 'Incoordenação motora', 'Dependência'],
+    notes: 'Medicamento controlado (Receita B1 Azul). Causa sedação.'
+  },
+  {
+    name: 'Sertralina',
+    class: 'Antidepressivo (ISRS - C1)',
+    indication: 'Depressão, ansiedade, TOC, pânico.',
+    dosageAdult: '50mg a 200mg uma vez ao dia.',
+    dosageChild: 'Sob orientação especializada.',
+    interactions: ['IMAOs', 'Tramadol', 'Varfarina'],
+    contraindications: ['Uso de IMAOs', 'Hipersensibilidade.'],
+    sideEffects: ['Náuseas', 'Insônia', 'Disfunção sexual'],
+    notes: 'Medicamento controlado (Receita C1 Branca). Efeito demora 2-4 semanas.'
+  }
+];
+
+export interface Legislation {
+  title: string;
+  recipeType: string;
+  validity: string;
+  retention: string;
+  examples: string[];
+  notes: string;
+}
+
+export const OFFLINE_LEGISLATION: Legislation[] = [
+  {
+    title: 'Portaria 344/98 - Lista A (Entorpecentes)',
+    recipeType: 'Notificação de Receita A (Amarela)',
+    validity: '30 dias',
+    retention: 'Retém a Notificação, devolve a Receita.',
+    examples: ['Morfina', 'Metilfenidato (Ritalina)', 'Oxicodona'],
+    notes: 'Exige cadastro do profissional na Vigilância Sanitária.'
+  },
+  {
+    title: 'Portaria 344/98 - Lista B1 (Psicotrópicos)',
+    recipeType: 'Notificação de Receita B (Azul)',
+    validity: '30 dias',
+    retention: 'Retém a Notificação, devolve a Receita.',
+    examples: ['Clonazepam', 'Alprazolam', 'Diazepam', 'Bromazepam'],
+    notes: 'Limite de 5 ampolas ou tratamento para 60 dias.'
+  },
+  {
+    title: 'Portaria 344/98 - Lista B2 (Anorexígenos)',
+    recipeType: 'Notificação de Receita B2 (Azul)',
+    validity: '30 dias',
+    retention: 'Retém a Notificação + Termo de Responsabilidade.',
+    examples: ['Sibutramina'],
+    notes: 'Exige termo de consentimento assinado pelo paciente.'
+  },
+  {
+    title: 'Portaria 344/98 - Lista C1 (Controle Especial)',
+    recipeType: 'Receita de Controle Especial (Branca - 2 vias)',
+    validity: '30 dias',
+    retention: 'Retém a 1ª via, devolve a 2ª via.',
+    examples: ['Antidepressivos', 'Anticonvulsivantes', 'Antipsicóticos'],
+    notes: 'Válida em todo território nacional.'
+  },
+  {
+    title: 'Antibióticos (RDC 20/2011)',
+    recipeType: 'Receita Comum (Branca - 2 vias)',
+    validity: '10 dias',
+    retention: 'Retém a 1ª via, devolve a 2ª via.',
+    examples: ['Amoxicilina', 'Azitromicina', 'Cefalexina'],
+    notes: 'Deve conter identificação do comprador e fornecedor.'
   }
 ];
 
@@ -239,3 +390,23 @@ export const OFFLINE_SYMPTOMS: SymptomGuide[] = [
     ]
   }
 ];
+
+// Pre-normalized data for faster lookups
+export const MEDS_MAP = new Map<string, Medication>(
+  OFFLINE_MEDS.map(med => [med.name.toLowerCase(), med])
+);
+
+export const SYMPTOMS_MAP = new Map<string, SymptomGuide>(
+  OFFLINE_SYMPTOMS.map(s => [s.symptom.toLowerCase(), s])
+);
+
+// Search Index for keyword matching
+export const SEARCH_INDEX = {
+  meds: OFFLINE_MEDS.map(m => ({ name: m.name.toLowerCase(), data: m })),
+  interactions: OFFLINE_INTERACTIONS.map(i => ({ 
+    drugs: i.drugs.toLowerCase(), 
+    tokens: i.drugs.toLowerCase().split(/[ +()]+/).filter(t => t.length > 2),
+    data: i 
+  })),
+  symptoms: OFFLINE_SYMPTOMS.map(s => ({ symptom: s.symptom.toLowerCase(), data: s }))
+};

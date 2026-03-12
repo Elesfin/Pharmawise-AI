@@ -40,6 +40,10 @@ import {
   OFFLINE_MEDS, 
   OFFLINE_INTERACTIONS, 
   OFFLINE_SYMPTOMS,
+  OFFLINE_LEGISLATION,
+  MEDS_MAP,
+  SYMPTOMS_MAP,
+  SEARCH_INDEX,
   Medication,
   Interaction,
   SymptomGuide
@@ -319,50 +323,85 @@ export default function App() {
     const q = query.toLowerCase().trim();
     let results: string[] = [];
 
-    // 1. Search in Expanded Medication Database
-    OFFLINE_MEDS.forEach(med => {
-      if (med.name.toLowerCase().includes(q) || q.includes(med.name.toLowerCase())) {
-        results.push(`### 💊 ${med.name}\n**Classe:** ${med.class}\n**Indicação:** ${med.indication}\n\n**Posologia:**\n- Adulto: ${med.dosageAdult}\n- Criança: ${med.dosageChild}\n\n**Interações:** ${med.interactions.join(', ')}\n**Contraindicações:** ${med.contraindications.join(', ')}\n**Efeitos Colaterais:** ${med.sideEffects.join(', ')}\n\n**Notas Técnicas:** ${med.notes}`);
-      }
-    });
+    // 1. O(1) Lookup for Exact Matches (Fastest)
+    const exactMed = MEDS_MAP.get(q);
+    if (exactMed) {
+      results.push(`### 💊 ${exactMed.name}\n**Classe:** ${exactMed.class}\n**Indicação:** ${exactMed.indication}\n\n**Posologia:**\n- Adulto: ${exactMed.dosageAdult}\n- Criança: ${exactMed.dosageChild}\n\n**Interações:** ${exactMed.interactions.join(', ')}\n**Contraindicações:** ${exactMed.contraindications.join(', ')}\n**Efeitos Colaterais:** ${exactMed.sideEffects.join(', ')}\n\n**Notas Técnicas:** ${exactMed.notes}`);
+    }
 
-    // 2. Search in Expanded Interactions
-    OFFLINE_INTERACTIONS.forEach(item => {
-      if (item.drugs.toLowerCase().includes(q) || q.includes('interação') && (item.drugs.toLowerCase().split(' + ').some(d => q.includes(d.toLowerCase())))) {
-        results.push(`### ⚠️ Interação: ${item.drugs}\n**Nível:** ${item.level}\n**Efeito:** ${item.effect}\n**Risco:** ${item.risk}`);
-      }
-    });
+    const exactSymptom = SYMPTOMS_MAP.get(q);
+    if (exactSymptom) {
+      const meds = exactSymptom.recommendations.map(m => `- **${m.name}** (${m.class}): ${m.note}`).join('\n');
+      results.push(`### 🌡️ Guia para: ${exactSymptom.symptom}\n**Medicamentos sugeridos:**\n${meds}`);
+    }
 
-    // 3. Search in Expanded Symptoms
-    OFFLINE_SYMPTOMS.forEach(data => {
-      if (data.symptom.toLowerCase().includes(q) || q.includes(data.symptom.toLowerCase())) {
-        const meds = data.recommendations.map(m => `- **${m.name}** (${m.class}): ${m.note}`).join('\n');
-        results.push(`### 🌡️ Guia para: ${data.symptom}\n**Medicamentos sugeridos:**\n${meds}`);
-      }
-    });
-
-    // 4. Search in Dosage Forms (Legacy support)
-    DOSAGE_FORMS.forEach(cat => {
-      cat.items.forEach(item => {
-        if (item.name.toLowerCase().includes(q)) {
-          results.push(`### 📦 Forma: ${item.name}\n**Descrição:** ${item.description}\n**Exemplos:** ${item.examples}`);
+    // 2. Optimized Keyword Search (if no exact match or to find more)
+    if (results.length === 0) {
+      // Search in Meds Index
+      SEARCH_INDEX.meds.forEach(m => {
+        if (m.name.includes(q) || q.includes(m.name)) {
+          results.push(`### 💊 ${m.data.name}\n**Classe:** ${m.data.class}\n**Indicação:** ${m.data.indication}\n\n**Posologia:**\n- Adulto: ${m.data.dosageAdult}\n- Criança: ${m.data.dosageChild}`);
         }
       });
-    });
+
+      // Search in Interactions Index (Tokenized)
+      const queryTokens = q.split(/[ +()]+/).filter(t => t.length > 2);
+      SEARCH_INDEX.interactions.forEach(i => {
+        const hasMatch = i.tokens.some(token => queryTokens.includes(token)) || i.drugs.includes(q);
+        if (hasMatch) {
+          results.push(`### ⚠️ Interação: ${i.data.drugs}\n**Nível:** ${i.data.level}\n**Efeito:** ${i.data.effect}\n**Risco:** ${i.data.risk}`);
+        }
+      });
+
+      // Search in Symptoms Index
+      SEARCH_INDEX.symptoms.forEach(s => {
+        if (s.symptom.includes(q) || q.includes(s.symptom)) {
+          const meds = s.data.recommendations.map(m => `- **${m.name}** (${m.class}): ${m.note}`).join('\n');
+          results.push(`### 🌡️ Guia para: ${s.data.symptom}\n**Medicamentos sugeridos:**\n${meds}`);
+        }
+      });
+
+      // Search in Legislation
+      OFFLINE_LEGISLATION.forEach(leg => {
+        const isMatch = leg.title.toLowerCase().includes(q) || 
+                        leg.examples.some(ex => q.includes(ex.toLowerCase())) ||
+                        (q.includes('receita') && leg.recipeType.toLowerCase().includes(q)) ||
+                        (q.includes('portaria') && leg.title.toLowerCase().includes('344'));
+        
+        if (isMatch) {
+          results.push(`### 📜 ${leg.title}\n**Tipo de Receita:** ${leg.recipeType}\n**Validade:** ${leg.validity}\n**Retenção:** ${leg.retention}\n\n**Exemplos:** ${leg.examples.join(', ')}\n**Notas:** ${leg.notes}`);
+        }
+      });
+    }
+
+    // 3. Legacy Dosage Forms (Small enough for simple search)
+    if (results.length === 0) {
+      DOSAGE_FORMS.forEach(cat => {
+        cat.items.forEach(item => {
+          if (item.name.toLowerCase().includes(q)) {
+            results.push(`### 📦 Forma: ${item.name}\n**Descrição:** ${item.description}\n**Exemplos:** ${item.examples}`);
+          }
+        });
+      });
+    }
 
     if (results.length > 0) {
       const header = isOnline 
         ? `### 📚 Informação do Banco de Dados Local\n\nEncontrei informações precisas no meu banco de dados offline para "**${query}**":\n\n`
-        : `### 📡 Modo Offline Ativo\n\nExibindo resultados do banco de dados local para "**${query}**":\n\n`;
+        : `### 📡 Modo Offline Ativo\n\n> **Atenção:** Você está visualizando dados da nossa **Base de Dados de Segurança Local**. Estas informações são estáticas e servem como referência rápida.\n\n---\n\n`;
       
-      return `${header}${results.join('\n\n---\n\n')}\n\n*Nota: Esta resposta foi gerada a partir do banco de dados de segurança local. Para dúvidas mais complexas, a IA (Gemini) pode ser consultada quando houver conexão.*`;
+      const footer = isOnline
+        ? `\n\n*Nota: Esta resposta foi gerada a partir do banco de dados de segurança local.*`
+        : `\n\n---\n\n**Ações Disponíveis:**\n- 🔄 Tente termos mais simples\n- 📡 Conecte-se para análise completa com IA\n- 📖 Consulte os Guias de Referência na barra lateral`;
+
+      return `${header}${results.join('\n\n---\n\n')}${footer}`;
     }
 
     if (!isOnline) {
       return `### 📡 Modo Offline\n\nSinto muito, não encontrei informações específicas sobre "**${query}**" no meu banco de dados local.\n\nComo você está **offline**, não consigo consultar a inteligência artificial completa. Por favor, tente termos mais simples ou conecte-se à internet.`;
     }
 
-    return `Sinto muito, não encontrei no banco offline.`; // This will trigger the Gemini fallback in handleSend
+    return `Sinto muito, não encontrei no banco offline.`;
   };
 
   const generateLogo = async () => {
@@ -481,13 +520,37 @@ export default function App() {
             "flex items-center gap-2 px-3 py-1.5 rounded-full border text-xs font-bold transition-all",
             isOnline 
               ? "bg-emerald-50 text-emerald-700 border-emerald-100" 
-              : "bg-amber-50 text-amber-700 border-amber-100"
+              : "bg-amber-100 text-amber-800 border-amber-200 shadow-sm animate-pulse"
           )}>
             {isOnline ? <Wifi className="w-3.5 h-3.5" /> : <WifiOff className="w-3.5 h-3.5" />}
             <span className="hidden sm:inline">{isOnline ? 'Online' : 'Modo Offline'}</span>
           </div>
         </div>
       </header>
+
+      {/* Offline Banner */}
+      <AnimatePresence>
+        {!isOnline && (
+          <motion.div 
+            initial={{ height: 0, opacity: 0 }}
+            animate={{ height: 'auto', opacity: 1 }}
+            exit={{ height: 0, opacity: 0 }}
+            className="bg-amber-500 text-white px-6 py-2 flex items-center justify-between text-xs font-bold uppercase tracking-wider overflow-hidden"
+          >
+            <div className="flex items-center gap-2">
+              <AlertOctagon className="w-4 h-4" />
+              <span>Você está desconectado. O PharmaWise AI está operando com o Banco de Dados Local.</span>
+            </div>
+            <button 
+              onClick={() => window.location.reload()}
+              className="bg-white/20 hover:bg-white/30 px-3 py-1 rounded-lg transition-colors flex items-center gap-1"
+            >
+              <Wifi className="w-3 h-3" />
+              Tentar Reconectar
+            </button>
+          </motion.div>
+        )}
+      </AnimatePresence>
 
       {/* Main Content */}
       <main className="flex-1 overflow-hidden flex flex-col md:flex-row max-w-7xl mx-auto w-full relative">
