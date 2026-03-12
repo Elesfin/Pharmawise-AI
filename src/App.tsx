@@ -257,12 +257,21 @@ export default function App() {
   }, [messages]);
 
   const handleSend = async () => {
-    if (!input.trim() || isLoading || !isOnline) return;
+    if (!input.trim() || isLoading) return;
 
     const userMessage = input.trim();
     setInput('');
     setMessages(prev => [...prev, { role: 'user', content: userMessage }]);
     setIsLoading(true);
+
+    if (!isOnline) {
+      setTimeout(() => {
+        const offlineResponse = searchOffline(userMessage);
+        setMessages(prev => [...prev, { role: 'assistant', content: offlineResponse }]);
+        setIsLoading(false);
+      }, 800);
+      return;
+    }
 
     try {
       // Prepare history for Gemini (excluding the initial greeting if needed, 
@@ -281,6 +290,52 @@ export default function App() {
     } finally {
       setIsLoading(false);
     }
+  };
+
+  const searchOffline = (query: string): string => {
+    const q = query.toLowerCase();
+    let results: string[] = [];
+
+    // Search in Dosages
+    COMMON_DOSAGES.forEach(cat => {
+      cat.items.forEach(item => {
+        if (item.name.toLowerCase().includes(q)) {
+          results.push(`**${item.name} (Posologia)**\n- Adulto: ${item.adult}\n- Criança: ${item.child}\n- Nota: ${item.note}`);
+        }
+      });
+    });
+
+    // Search in Interactions
+    COMMON_INTERACTIONS.forEach(level => {
+      level.items.forEach(item => {
+        if (item.drugs.toLowerCase().includes(q)) {
+          results.push(`**Interação: ${item.drugs}**\n- Nível: ${level.level}\n- Efeito: ${item.effect}\n- Risco: ${item.risk}`);
+        }
+      });
+    });
+
+    // Search in Symptoms
+    SYMPTOMS_DATA.forEach(data => {
+      if (data.symptom.toLowerCase().includes(q)) {
+        const meds = data.medications.map(m => `- **${m.name}** (${m.class}): ${m.note}`).join('\n');
+        results.push(`**Sintoma: ${data.symptom}**\nMedicamentos sugeridos:\n${meds}`);
+      }
+    });
+
+    // Search in Dosage Forms
+    DOSAGE_FORMS.forEach(cat => {
+      cat.items.forEach(item => {
+        if (item.name.toLowerCase().includes(q)) {
+          results.push(`**Forma Farmacêutica: ${item.name}**\n- Descrição: ${item.description}\n- Exemplos: ${item.examples}`);
+        }
+      });
+    });
+
+    if (results.length > 0) {
+      return `### Resultados da Busca Offline (Base de Dados Local)\n\nEncontrei as seguintes informações na minha base de dados local para "**${query}**":\n\n${results.join('\n\n---\n\n')}\n\n*Nota: Como você está offline, estou usando apenas minha base de dados de referência local. Para uma análise completa com IA, conecte-se à internet.*`;
+    }
+
+    return `Sinto muito, não encontrei informações específicas sobre "**${query}**" na minha base de dados offline.\n\nComo estou **offline**, minha capacidade de resposta está limitada à base de dados local pré-carregada. Por favor, conecte-se à internet para usar todo o poder da inteligência artificial do PharmaWise AI.`;
   };
 
   const generateLogo = async () => {
@@ -316,7 +371,7 @@ export default function App() {
   }, []);
 
   const handleCheckInteraction = () => {
-    if (!checker.drugA || !checker.drugB || !isOnline) return;
+    if (!checker.drugA || !checker.drugB) return;
     const prompt = `Quais as interações medicamentosas entre ${checker.drugA} e ${checker.drugB}? Indique o nível de risco e descreva o efeito.`;
     setInput(prompt);
     setChecker({ drugA: '', drugB: '' });
@@ -324,7 +379,7 @@ export default function App() {
   };
 
   const handleCheckPosology = () => {
-    if (!posologySearch || !isOnline) return;
+    if (!posologySearch) return;
     const prompt = `Qual a posologia recomendada para ${posologySearch}? Inclua doses para adultos e crianças (se aplicável) e observações importantes.`;
     setInput(prompt);
     setPosologySearch('');
@@ -332,7 +387,7 @@ export default function App() {
   };
 
   const handleCalculate = () => {
-    if (!calculator.medication || !isOnline) return;
+    if (!calculator.medication) return;
     const weightInfo = calculator.weight ? `para uma criança de ${calculator.weight}kg` : 'para um adulto';
     const prompt = `Calcule a posologia de ${calculator.medication} ${weightInfo}, com frequência de ${calculator.frequency}. Forneça a dose por administração e orientações de segurança.`;
     setInput(prompt);
