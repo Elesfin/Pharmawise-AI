@@ -21,7 +21,10 @@ import {
   Sparkles,
   Wifi,
   WifiOff,
-  BookOpen
+  BookOpen,
+  Check,
+  CheckCheck,
+  Clock
 } from 'lucide-react';
 import Markdown from 'react-markdown';
 import { motion, AnimatePresence } from 'motion/react';
@@ -47,6 +50,8 @@ function cn(...inputs: ClassValue[]) {
 interface Message {
   role: 'user' | 'assistant';
   content: string;
+  timestamp: string;
+  status?: 'sending' | 'sent' | 'read';
 }
 
 const getApiKey = () => {
@@ -77,7 +82,9 @@ export default function App() {
   const [messages, setMessages] = useState<Message[]>([
     {
       role: 'assistant',
-      content: 'Olá! Sou o **PharmaWise AI**, seu assistente especializado em farmácia de dispensação. Como posso ajudar você hoje com informações sobre medicamentos, interações ou posologia?\n\n*Este aplicativo não substitui a orientação médica ou farmacêutica. É indispensável a consulta com estes profissionais.*'
+      content: 'Olá! Sou o **PharmaWise AI**, seu assistente especializado em farmácia de dispensação. Como posso ajudar você hoje com informações sobre medicamentos, interações ou posologia?\n\n*Este aplicativo não substitui a orientação médica ou farmacêutica. É indispensável a consulta com estes profissionais.*',
+      timestamp: new Date().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' }),
+      status: 'read'
     }
   ]);
   const [input, setInput] = useState('');
@@ -112,9 +119,23 @@ export default function App() {
     if (!input.trim() || isLoading) return;
 
     const userMessage = input.trim();
+    const timestamp = new Date().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' });
+    
     setInput('');
-    setMessages(prev => [...prev, { role: 'user', content: userMessage }]);
+    setMessages(prev => [...prev, { 
+      role: 'user', 
+      content: userMessage, 
+      timestamp, 
+      status: 'sending' as const
+    }]);
     setIsLoading(true);
+
+    // Update status to sent after a tiny delay
+    setTimeout(() => {
+      setMessages(prev => prev.map((m, i) => 
+        i === prev.length - 1 ? { ...m, status: 'sent' as const } : m
+      ));
+    }, 500);
 
     // Check offline database first
     const offlineResponse = searchOffline(userMessage);
@@ -122,9 +143,17 @@ export default function App() {
 
     if (!isOnline || isDirectMatch) {
       setTimeout(() => {
-        setMessages(prev => [...prev, { role: 'assistant', content: offlineResponse }]);
+        setMessages(prev => [
+          ...prev.map(m => m.role === 'user' ? { ...m, status: 'read' as const } : m),
+          { 
+            role: 'assistant', 
+            content: offlineResponse, 
+            timestamp: new Date().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' }),
+            status: 'read' as const
+          }
+        ]);
         setIsLoading(false);
-      }, 600);
+      }, 1000);
       return;
     }
 
@@ -137,7 +166,15 @@ export default function App() {
         }));
 
       const response = await askPharmaAI(userMessage, history);
-      setMessages(prev => [...prev, { role: 'assistant', content: response || 'Desculpe, não consegui processar sua solicitação.' }]);
+      setMessages(prev => [
+        ...prev.map(m => m.role === 'user' ? { ...m, status: 'read' as const } : m),
+        { 
+          role: 'assistant', 
+          content: response || 'Desculpe, não consegui processar sua solicitação.', 
+          timestamp: new Date().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' }),
+          status: 'read' as const
+        }
+      ]);
     } catch (error: any) {
       let errorMessage = 'Ocorreu um erro ao processar sua pergunta. Por favor, tente novamente mais tarde.';
       
@@ -147,7 +184,15 @@ export default function App() {
         errorMessage = '### ⏳ Limite de Uso Atingido\n\nVocê atingiu o limite de uso gratuito do Gemini para este período.\n\n**O que fazer:**\n1. Aguarde alguns minutos ou horas para o limite resetar.\n2. Verifique se você está usando o modelo correto nas configurações.';
       }
       
-      setMessages(prev => [...prev, { role: 'assistant', content: errorMessage }]);
+      setMessages(prev => [
+        ...prev.map(m => m.role === 'user' ? { ...m, status: 'read' as const } : m),
+        { 
+          role: 'assistant', 
+          content: errorMessage, 
+          timestamp: new Date().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' }),
+          status: 'read' as const
+        }
+      ]);
     } finally {
       setIsLoading(false);
     }
@@ -390,27 +435,46 @@ export default function App() {
             <div 
               key={idx} 
               className={cn(
-                "flex gap-4 max-w-[85%]",
+                "flex gap-3 max-w-[90%] md:max-w-[80%]",
                 msg.role === 'user' ? "ml-auto flex-row-reverse" : "mr-auto"
               )}
             >
               <div className={cn(
-                "w-10 h-10 rounded-full flex items-center justify-center shrink-0 shadow-sm",
-                msg.role === 'user' ? "bg-emerald-100 text-emerald-700" : "bg-white border border-slate-200 text-slate-600"
-              )}>
-                {msg.role === 'user' ? <User className="w-5 h-5" /> : <Bot className="w-5 h-5" />}
-              </div>
-              <div className={cn(
-                "p-4 rounded-2xl shadow-sm",
+                "w-8 h-8 md:w-10 md:h-10 rounded-full flex items-center justify-center shrink-0 shadow-sm border",
                 msg.role === 'user' 
-                  ? "bg-emerald-600 text-white rounded-tr-none" 
-                  : "bg-white border border-slate-100 text-slate-800 rounded-tl-none"
+                  ? "bg-emerald-500 text-white border-emerald-400" 
+                  : "bg-white border-slate-200 text-slate-600"
               )}>
+                {msg.role === 'user' ? <User className="w-4 h-4 md:w-5 md:h-5" /> : <Bot className="w-4 h-4 md:w-5 md:h-5" />}
+              </div>
+              <div className="flex flex-col gap-1">
                 <div className={cn(
-                  "prose prose-sm max-w-none",
-                  msg.role === 'user' ? "prose-invert" : "prose-slate"
+                  "p-3 md:p-4 rounded-2xl shadow-sm relative group",
+                  msg.role === 'user' 
+                    ? "bg-emerald-600 text-white rounded-tr-none" 
+                    : "bg-white border border-slate-100 text-slate-800 rounded-tl-none"
                 )}>
-                  <Markdown>{msg.content}</Markdown>
+                  <div className={cn(
+                    "prose prose-sm max-w-none",
+                    msg.role === 'user' ? "prose-invert" : "prose-slate"
+                  )}>
+                    <Markdown>{msg.content}</Markdown>
+                  </div>
+                </div>
+                <div className={cn(
+                  "flex items-center gap-1.5 px-1",
+                  msg.role === 'user' ? "justify-end" : "justify-start"
+                )}>
+                  <span className="text-[10px] text-slate-400 font-medium">
+                    {msg.timestamp}
+                  </span>
+                  {msg.role === 'user' && (
+                    <div className="flex items-center">
+                      {msg.status === 'sending' && <Clock className="w-3 h-3 text-slate-300 animate-pulse" />}
+                      {msg.status === 'sent' && <Check className="w-3 h-3 text-slate-300" />}
+                      {msg.status === 'read' && <CheckCheck className="w-3 h-3 text-emerald-500" />}
+                    </div>
+                  )}
                 </div>
               </div>
             </div>
