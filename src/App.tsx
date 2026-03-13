@@ -109,10 +109,20 @@ export default function App() {
     };
   }, []);
 
-  useEffect(() => {
+  const scrollToBottom = (behavior: ScrollBehavior = 'auto') => {
     if (scrollRef.current) {
-      scrollRef.current.scrollTop = scrollRef.current.scrollHeight;
+      const { scrollHeight, clientHeight } = scrollRef.current;
+      scrollRef.current.scrollTo({
+        top: scrollHeight - clientHeight,
+        behavior
+      });
     }
+  };
+
+  useEffect(() => {
+    // Small delay to ensure DOM is updated
+    const timeoutId = setTimeout(() => scrollToBottom('smooth'), 100);
+    return () => clearTimeout(timeoutId);
   }, [messages]);
 
   const handleSend = async () => {
@@ -429,7 +439,7 @@ export default function App() {
           {/* Chat Area */}
           <div 
             ref={scrollRef}
-            className="flex-1 overflow-y-auto p-4 md:p-6 space-y-6 scroll-smooth pb-32 md:pb-6"
+            className="flex-1 overflow-y-auto p-4 md:p-6 space-y-6 scroll-smooth pb-40 md:pb-48"
           >
           {messages.map((msg, idx) => (
             <div 
