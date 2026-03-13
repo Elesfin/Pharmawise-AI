@@ -97,6 +97,7 @@ export default function App() {
   const [logoUrl, setLogoUrl] = useState<string | null>(null);
   const [isGeneratingLogo, setIsGeneratingLogo] = useState(false);
   const scrollRef = useRef<HTMLDivElement>(null);
+  const messagesEndRef = useRef<HTMLDivElement>(null);
 
   useEffect(() => {
     const handleOnline = () => setIsOnline(true);
@@ -109,8 +110,10 @@ export default function App() {
     };
   }, []);
 
-  const scrollToBottom = (behavior: ScrollBehavior = 'auto') => {
-    if (scrollRef.current) {
+  const scrollToBottom = (behavior: ScrollBehavior = 'smooth') => {
+    if (messagesEndRef.current) {
+      messagesEndRef.current.scrollIntoView({ behavior, block: 'end' });
+    } else if (scrollRef.current) {
       const { scrollHeight, clientHeight } = scrollRef.current;
       scrollRef.current.scrollTo({
         top: scrollHeight - clientHeight,
@@ -120,10 +123,12 @@ export default function App() {
   };
 
   useEffect(() => {
-    // Small delay to ensure DOM is updated
-    const timeoutId = setTimeout(() => scrollToBottom('smooth'), 100);
+    // Small delay to ensure DOM is updated and images/markdown are rendered
+    const timeoutId = setTimeout(() => {
+      scrollToBottom('smooth');
+    }, 150);
     return () => clearTimeout(timeoutId);
-  }, [messages]);
+  }, [messages, isLoading]);
 
   const handleSend = async () => {
     if (!input.trim() || isLoading) return;
@@ -439,7 +444,7 @@ export default function App() {
           {/* Chat Area */}
           <div 
             ref={scrollRef}
-            className="flex-1 overflow-y-auto p-4 md:p-6 space-y-6 scroll-smooth pb-40 md:pb-48"
+            className="flex-1 overflow-y-auto p-4 md:p-6 space-y-6 scroll-smooth pb-52 md:pb-64"
           >
           {messages.map((msg, idx) => (
             <div 
@@ -504,6 +509,7 @@ export default function App() {
               </div>
             </div>
           )}
+          <div ref={messagesEndRef} className="h-4 w-full" />
           </div>
 
           {/* Quick Actions & Input Area */}
