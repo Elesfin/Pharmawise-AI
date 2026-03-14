@@ -6,6 +6,7 @@
 export interface Medication {
   name: string;
   brandNames?: string[];
+  laboratory?: string;
   class: string;
   indication: string;
   dosageAdult: string;
@@ -37,6 +38,7 @@ export const OFFLINE_MEDS: Medication[] = [
   {
     name: 'Amoxicilina',
     brandNames: ['Amoxil', 'Novamox', 'Velamox'],
+    laboratory: 'EMS',
     class: 'Antibiótico (Penicilina)',
     indication: 'Infecções bacterianas (garganta, ouvido, sinusite).',
     dosageAdult: '500mg a 1g a cada 8h ou 12h.',
@@ -49,6 +51,7 @@ export const OFFLINE_MEDS: Medication[] = [
   {
     name: 'Amoxicilina + Clavulanato',
     brandNames: ['Clavulin', 'Sigma-Clav', 'Sinot'],
+    laboratory: 'GlaxoSmithKline (GSK)',
     class: 'Antibiótico (Penicilina + Inibidor de Beta-lactamase)',
     indication: 'Infecções resistentes, sinusites, pneumonias, mordidas.',
     dosageAdult: '500/125mg 3x/dia ou 875/125mg 2x/dia.',
@@ -61,6 +64,7 @@ export const OFFLINE_MEDS: Medication[] = [
   {
     name: 'Azitromicina',
     brandNames: ['Astro', 'Zitromax', 'Azitromed'],
+    laboratory: 'Pfizer',
     class: 'Antibiótico (Macrolídeo)',
     indication: 'Infecções respiratórias, DSTs, infecções de pele.',
     dosageAdult: '500mg uma vez ao dia por 3 a 5 dias.',
@@ -73,6 +77,7 @@ export const OFFLINE_MEDS: Medication[] = [
   {
     name: 'Cefalexina',
     brandNames: ['Keflex', 'Cefacimed', 'Cefagel'],
+    laboratory: 'Eli Lilly',
     class: 'Antibiótico (Cefalosporina)',
     indication: 'Infecções de pele, urinárias e respiratórias.',
     dosageAdult: '500mg a cada 6h.',
@@ -85,6 +90,7 @@ export const OFFLINE_MEDS: Medication[] = [
   {
     name: 'Ciprofloxacino',
     brandNames: ['Cipro', 'Ciloxan', 'Quinoflox'],
+    laboratory: 'Bayer',
     class: 'Antibiótico (Quinolona)',
     indication: 'Infecções urinárias graves, prostatites, diarreia bacteriana.',
     dosageAdult: '500mg a 750mg a cada 12h.',
@@ -110,6 +116,7 @@ export const OFFLINE_MEDS: Medication[] = [
   {
     name: 'Losartana Potássica',
     brandNames: ['Aradois', 'Cozaar', 'Torlós'],
+    laboratory: 'Aché',
     class: 'Anti-hipertensivo (BRA)',
     indication: 'Hipertensão arterial e insuficiência cardíaca.',
     dosageAdult: '50mg a 100mg uma vez ao dia.',
@@ -122,6 +129,7 @@ export const OFFLINE_MEDS: Medication[] = [
   {
     name: 'Atenolol',
     brandNames: ['Ablok', 'Atenorese', 'Angipress'],
+    laboratory: 'AstraZeneca',
     class: 'Anti-hipertensivo (Betabloqueador)',
     indication: 'Hipertensão, arritmias, angina.',
     dosageAdult: '25mg a 100mg uma vez ao dia.',
@@ -134,6 +142,7 @@ export const OFFLINE_MEDS: Medication[] = [
   {
     name: 'Anlodipino',
     brandNames: ['Norvasc', 'Pressat', 'Nicord'],
+    laboratory: 'Pfizer',
     class: 'Anti-hipertensivo (Bloqueador de Canais de Cálcio)',
     indication: 'Hipertensão e angina.',
     dosageAdult: '5mg a 10mg uma vez ao dia.',
@@ -146,6 +155,7 @@ export const OFFLINE_MEDS: Medication[] = [
   {
     name: 'Enalapril',
     brandNames: ['Renitec', 'Eupressin', 'Atens'],
+    laboratory: 'MSD (Merck Sharp & Dohme)',
     class: 'Anti-hipertensivo (IECA)',
     indication: 'Hipertensão e insuficiência cardíaca.',
     dosageAdult: '5mg a 40mg ao dia (1 ou 2 doses).',
@@ -184,6 +194,7 @@ export const OFFLINE_MEDS: Medication[] = [
   {
     name: 'Metformina',
     brandNames: ['Glifage', 'Glucoformin', 'Diaformin'],
+    laboratory: 'Libbs',
     class: 'Antidiabético Oral (Biguanida)',
     indication: 'Diabetes Mellitus Tipo 2.',
     dosageAdult: '500mg a 850mg 2 a 3x ao dia.',
@@ -210,6 +221,7 @@ export const OFFLINE_MEDS: Medication[] = [
   {
     name: 'Sinvastatina',
     brandNames: ['Zocor', 'Sinvastacor', 'Vaslip'],
+    laboratory: 'Merck',
     class: 'Hipolipemiante (Estatina)',
     indication: 'Colesterol alto e prevenção cardiovascular.',
     dosageAdult: '10mg a 40mg uma vez ao dia (à noite).',
@@ -236,6 +248,7 @@ export const OFFLINE_MEDS: Medication[] = [
   {
     name: 'Omeprazol',
     brandNames: ['Losec', 'Victrix', 'Gastrium'],
+    laboratory: 'Medley',
     class: 'Inibidor da Bomba de Prótons (IBP)',
     indication: 'Gastrite, úlcera, refluxo gastroesofágico.',
     dosageAdult: '20mg a 40mg uma vez ao dia em jejum.',
@@ -310,6 +323,7 @@ export const OFFLINE_MEDS: Medication[] = [
   {
     name: 'Ibuprofeno',
     brandNames: ['Advil', 'Alivium', 'Ibusal'],
+    laboratory: 'Eurofarma',
     class: 'Anti-inflamatório Não Esteroidal (AINE)',
     indication: 'Inflamação, dor e febre.',
     dosageAdult: '400mg a 600mg a cada 6-8h.',
@@ -345,6 +359,7 @@ export const OFFLINE_MEDS: Medication[] = [
   // --- PSICOTRÓPICOS (PORTARIA 344/98) ---
   {
     name: 'Clonazepam',
+    laboratory: 'Roche',
     class: 'Benzodiazepínico (Psicotrópico)',
     indication: 'Ansiedade, distúrbios do sono, crises epiléticas.',
     dosageAdult: '0,5mg a 2mg ao dia (conforme prescrição).',
@@ -367,6 +382,7 @@ export const OFFLINE_MEDS: Medication[] = [
   },
   {
     name: 'Fluoxetina',
+    laboratory: 'Eli Lilly',
     class: 'Antidepressivo (ISRS)',
     indication: 'Depressão, ansiedade, TOC, bulimia.',
     dosageAdult: '20mg a 60mg uma vez ao dia (manhã).',
@@ -457,6 +473,7 @@ export const OFFLINE_MEDS: Medication[] = [
   },
   {
     name: 'Levotiroxina Sódica',
+    laboratory: 'Sanofi',
     class: 'Hormônio Tireoidiano',
     indication: 'Hipotireoidismo e bócio.',
     dosageAdult: '25mcg a 200mcg uma vez ao dia em jejum.',
@@ -479,6 +496,7 @@ export const OFFLINE_MEDS: Medication[] = [
   },
   {
     name: 'Ondansetrona (Vonau)',
+    laboratory: 'Biolab',
     class: 'Antiemético',
     indication: 'Náuseas e vômitos (especialmente pós-quimio ou cirurgia).',
     dosageAdult: '4mg a 8mg até 3x ao dia.',
@@ -569,6 +587,7 @@ export const OFFLINE_MEDS: Medication[] = [
   {
     name: 'Rivaroxabana',
     brandNames: ['Xarelto', 'Rivarox'],
+    laboratory: 'Bayer',
     class: 'Anticoagulante (Inibidor do Fator Xa)',
     indication: 'Prevenção de AVC e tratamento de trombose (TVP/EP).',
     dosageAdult: '10mg a 20mg uma vez ao dia.',
@@ -1273,6 +1292,9 @@ export const SEARCH_INDEX = {
     const entries = [{ name: m.name.toLowerCase(), data: m }];
     if (m.brandNames) {
       m.brandNames.forEach(bn => entries.push({ name: bn.toLowerCase(), data: m }));
+    }
+    if (m.laboratory) {
+      entries.push({ name: m.laboratory.toLowerCase(), data: m });
     }
     return entries;
   }),

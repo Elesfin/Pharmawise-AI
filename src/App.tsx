@@ -100,6 +100,17 @@ const SEARCH_SUGGESTIONS = [
   'Semaglutida',
   'Topiramato',
   'Amiodarona',
+  'Aché',
+  'EMS',
+  'Medley',
+  'Eurofarma',
+  'Libbs',
+  'Merck',
+  'Roche',
+  'Pfizer',
+  'Sanofi',
+  'Biolab',
+  'Bayer',
   'Ozempic',
   'Buscopan',
   'Eliquis',
@@ -282,49 +293,132 @@ export default function App() {
       .trim();
   };
 
+  const levenshteinDistance = (a: string, b: string): number => {
+    const matrix = Array.from({ length: a.length + 1 }, () =>
+      Array.from({ length: b.length + 1 }, () => 0)
+    );
+
+    for (let i = 0; i <= a.length; i++) matrix[i][0] = i;
+    for (let j = 0; j <= b.length; j++) matrix[0][j] = j;
+
+    for (let i = 1; i <= a.length; i++) {
+      for (let j = 1; j <= b.length; j++) {
+        const cost = a[i - 1] === b[j - 1] ? 0 : 1;
+        matrix[i][j] = Math.min(
+          matrix[i - 1][j] + 1,
+          matrix[i][j - 1] + 1,
+          matrix[i - 1][j - 1] + cost
+        );
+      }
+    }
+    return matrix[a.length][b.length];
+  };
+
   const searchOffline = (query: string): string => {
     const q = normalizeText(query);
-    let results: string[] = [];
+    if (q.length < 2) return "Por favor, digite pelo menos 2 caracteres para a busca.";
+
+    interface ScoredMatch {
+      score: number;
+      content: string;
+      type: 'med' | 'interaction' | 'legislation';
+      originalName?: string;
+    }
+
+    let matches: ScoredMatch[] = [];
     const foundMeds = new Set<Medication>();
 
-    // Exact Match
-    const exactMed = MEDS_MAP.get(q);
-    if (exactMed) {
-      const brandInfo = exactMed.brandNames ? `\n**Nomes Fantasia:** ${exactMed.brandNames.join(', ')}` : '';
-      results.push(`### 💊 ${exactMed.name}${brandInfo}\n**Classe:** ${exactMed.class}\n**Indicação:** ${exactMed.indication}\n\n**Posologia:**\n- Adulto: ${exactMed.dosageAdult}\n- Criança: ${exactMed.dosageChild}\n\n**Interações:** ${exactMed.interactions.join(', ')}\n**Notas:** ${exactMed.notes}`);
-      foundMeds.add(exactMed);
+    // 1. Search Medications
+    SEARCH_INDEX.meds.forEach(m => {
+      const med = m.data;
+      if (foundMeds.has(med)) return;
+
+      const medName = normalizeText(med.name);
+      const entryName = normalizeText(m.name);
+      let score = 0;
+
+      // Exact match on name or brand or lab
+      if (entryName === q) {
+        score = 100;
+      } 
+      // Substring match
+      else if (entryName.includes(q) || q.includes(entryName)) {
+        score = 70;
+      }
+      // Fuzzy match
+      else if (q.length > 3 && entryName.length > 3) {
+        const distance = levenshteinDistance(q, entryName);
+        if (distance <= 2) {
+          score = 40 - distance * 5;
+        }
+      }
+
+      if (score > 0) {
+        // Bonus for rich data
+        if (med.brandNames && med.brandNames.length > 0) score += 5;
+        if (med.laboratory) score += 5;
+
+        const brandInfo = med.brandNames ? `\n**Nomes Fantasia:** ${med.brandNames.join(', ')}` : '';
+        const labInfo = med.laboratory ? `\n**Laboratório:** ${med.laboratory}` : '';
+        
+        let content = '';
+        if (score >= 90) {
+          content = `### 💊 ${med.name}${brandInfo}${labInfo}\n**Classe:** ${med.class}\n**Indicação:** ${med.indication}\n\n**Posologia:**\n- Adulto: ${med.dosageAdult}\n- Criança: ${med.dosageChild}\n\n**Interações:** ${med.interactions.join(', ')}\n**Notas:** ${med.notes}`;
+        } else {
+          content = `### 💊 ${med.name}${brandInfo}${labInfo}\n**Classe:** ${med.class}\n**Posologia Adulto:** ${med.dosageAdult}`;
+        }
+
+        matches.push({ score, content, type: 'med', originalName: med.name });
+        foundMeds.add(med);
+      }
+    });
+
+    // 2. Search Interactions
+    SEARCH_INDEX.interactions.forEach(i => {
+      const drugs = normalizeText(i.drugs);
+      let score = 0;
+      if (drugs === q) score = 95;
+      else if (drugs.includes(q)) score = 60;
+      
+      if (score > 0) {
+        matches.push({
+          score,
+          content: `### ⚠️ Interação: ${i.data.drugs}\n**Efeito:** ${i.data.effect}\n**Risco:** ${i.data.risk}`,
+          type: 'interaction'
+        });
+      }
+    });
+
+    // 3. Search Legislation
+    OFFLINE_LEGISLATION.forEach(leg => {
+      const title = normalizeText(leg.title);
+      let score = 0;
+      if (title === q) score = 90;
+      else if (title.includes(q)) score = 50;
+      else if (leg.examples.some(ex => normalizeText(ex).includes(q))) score = 45;
+
+      if (score > 0) {
+        matches.push({
+          score,
+          content: `### 📜 ${leg.title}\n**Receita:** ${leg.recipeType}\n**Validade:** ${leg.validity}\n**Retenção:** ${leg.retention}\n**Exemplos:** ${leg.examples.join(', ')}`,
+          type: 'legislation'
+        });
+      }
+    });
+
+    // Sort by score descending
+    matches.sort((a, b) => b.score - a.score);
+
+    // Limit results
+    const topMatches = matches.slice(0, 5);
+
+    if (topMatches.length > 0) {
+      const resultsText = topMatches.map(m => m.content).join('\n\n---\n\n');
+      const header = matches[0].score < 70 ? "### 🔍 Resultados Sugeridos (Busca Aproximada)\n\n" : "### 📚 Informação da Base Local\n\n";
+      return `${header}${resultsText}\n\n*Nota: Esta resposta foi extraída diretamente do banco de dados offline do PharmaWise.*`;
     }
 
-    // Keyword Search (only if no exact match or to find related)
-    if (results.length === 0) {
-      SEARCH_INDEX.meds.forEach(m => {
-        if (m.name.includes(q) || q.includes(m.name)) {
-          if (!foundMeds.has(m.data)) {
-            const brandInfo = m.data.brandNames ? `\n**Nomes Fantasia:** ${m.data.brandNames.join(', ')}` : '';
-            results.push(`### 💊 ${m.data.name}${brandInfo}\n**Classe:** ${m.data.class}\n**Posologia Adulto:** ${m.data.dosageAdult}`);
-            foundMeds.add(m.data);
-          }
-        }
-      });
-
-      SEARCH_INDEX.interactions.forEach(i => {
-        if (i.drugs.includes(q)) {
-          results.push(`### ⚠️ Interação: ${i.data.drugs}\n**Efeito:** ${i.data.effect}\n**Risco:** ${i.data.risk}`);
-        }
-      });
-
-      OFFLINE_LEGISLATION.forEach(leg => {
-        if (normalizeText(leg.title).includes(q) || leg.examples.some(ex => normalizeText(ex).includes(q))) {
-          results.push(`### 📜 ${leg.title}\n**Receita:** ${leg.recipeType}\n**Validade:** ${leg.validity}\n**Retenção:** ${leg.retention}`);
-        }
-      });
-    }
-
-    if (results.length > 0) {
-      return `### 📚 Informação da Base Local\n\n${results.join('\n\n---\n\n')}\n\n*Nota: Esta resposta foi extraída diretamente do banco de dados offline do PharmaWise.*`;
-    }
-
-    return `Sinto muito, não encontrei informações sobre "${query}" na base local.`;
+    return `Sinto muito, não encontrei informações precisas ou aproximadas sobre "${query}" na base local.`;
   };
 
   const generateLogo = async () => {
