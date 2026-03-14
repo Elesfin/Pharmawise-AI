@@ -76,6 +76,11 @@ const SEARCH_SUGGESTIONS = [
   'Cefalexina',
   'Atenolol',
   'Domperidona',
+  'Levotiroxina',
+  'Ondansetrona',
+  'Rivaroxabana',
+  'Zolpidem',
+  'Ciclobenzaprina',
   'Portaria 344/98',
   'RDC 20/2011'
 ];

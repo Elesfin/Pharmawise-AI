@@ -431,6 +431,193 @@ export const OFFLINE_MEDS: Medication[] = [
     contraindications: ['Risco de hemorragia ativa', 'Gravidez'],
     sideEffects: ['Sangramentos', 'Equimoses (manchas roxas)'],
     notes: 'Exige monitoramento rigoroso do RNI (tempo de coagulação).'
+  },
+  {
+    name: 'Levotiroxina Sódica',
+    class: 'Hormônio Tireoidiano',
+    indication: 'Hipotireoidismo e bócio.',
+    dosageAdult: '25mcg a 200mcg uma vez ao dia em jejum.',
+    dosageChild: 'Conforme peso e idade (uso pediátrico comum).',
+    interactions: ['Carbonato de Cálcio', 'Sulfato Ferroso', 'Soja'],
+    contraindications: ['Infarto agudo do miocárdio recente', 'Tireotoxicose'],
+    sideEffects: ['Taquicardia', 'Insônia', 'Perda de peso'],
+    notes: 'Tomar 30-60 min antes do café da manhã apenas com água.'
+  },
+  {
+    name: 'Metoclopramida (Plasil)',
+    class: 'Antiemético e Procinético',
+    indication: 'Náuseas, vômitos e distúrbios da motilidade digestiva.',
+    dosageAdult: '10mg até 3x ao dia.',
+    dosageChild: '0,1 a 0,15mg/kg até 3x ao dia.',
+    interactions: ['Antipsicóticos', 'Levodopa'],
+    contraindications: ['Feocromocitoma', 'Epilepsia', 'Hemorragia TGI'],
+    sideEffects: ['Sonolência', 'Sintomas extrapiramidais (tremores)'],
+    notes: 'Risco de discinesia tardia em uso prolongado.'
+  },
+  {
+    name: 'Ondansetrona (Vonau)',
+    class: 'Antiemético',
+    indication: 'Náuseas e vômitos (especialmente pós-quimio ou cirurgia).',
+    dosageAdult: '4mg a 8mg até 3x ao dia.',
+    dosageChild: '2mg a 4mg (conforme peso/idade).',
+    interactions: ['Apomorfina', 'Tramadol'],
+    contraindications: ['Uso de apomorfina', 'Hipersensibilidade'],
+    sideEffects: ['Constipação', 'Cefaleia', 'Sensação de calor'],
+    notes: 'Muito utilizado na forma de comprimidos orodispersíveis.'
+  },
+  {
+    name: 'Fluconazol',
+    class: 'Antifúngico Sistêmico',
+    indication: 'Candidíase vaginal, micoses de pele e unhas.',
+    dosageAdult: '150mg dose única (vaginal) ou semanal (unha).',
+    dosageChild: '3mg a 6mg/kg conforme indicação.',
+    interactions: ['Varfarina', 'Sinvastatina', 'Glibenclamida'],
+    contraindications: ['Hipersensibilidade a azóis'],
+    sideEffects: ['Dor abdominal', 'Náusea', 'Alteração no paladar'],
+    notes: 'Tratamento de micose de unha pode durar meses.'
+  },
+  {
+    name: 'Aciclovir',
+    class: 'Antiviral',
+    indication: 'Herpes simples e Herpes zoster.',
+    dosageAdult: '200mg a 800mg 5x ao dia (conforme caso).',
+    dosageChild: '20mg/kg até 4x ao dia.',
+    interactions: ['Probenecida'],
+    contraindications: ['Hipersensibilidade'],
+    sideEffects: ['Cefaleia', 'Tontura', 'Mal-estar'],
+    notes: 'Iniciar o uso preferencialmente aos primeiros sinais da lesão.'
+  },
+  {
+    name: 'Albendazol',
+    class: 'Anti-helmíntico (Vermífugo)',
+    indication: 'Verminoses (Ascaris, Giardia, etc).',
+    dosageAdult: '400mg dose única ou por 3 a 5 dias.',
+    dosageChild: '400mg dose única (>2 anos) ou 200mg (1-2 anos).',
+    interactions: ['Dexametasona', 'Praziquantel'],
+    contraindications: ['Gravidez', 'Mulheres planejando engravidar'],
+    sideEffects: ['Dor abdominal', 'Cefaleia'],
+    notes: 'Tomar preferencialmente com refeição gordurosa.'
+  },
+  {
+    name: 'Desloratadina',
+    class: 'Anti-histamínico (2ª Geração)',
+    indication: 'Rinite alérgica e urticária.',
+    dosageAdult: '5mg uma vez ao dia.',
+    dosageChild: '1,25mg (1-5 anos) ou 2,5mg (6-11 anos).',
+    interactions: ['Eritromicina', 'Cetoconazol'],
+    contraindications: ['Hipersensibilidade'],
+    sideEffects: ['Fadiga', 'Boca seca', 'Cefaleia'],
+    notes: 'Metabólito ativo da loratadina, não causa sonolência.'
+  },
+  {
+    name: 'Salbutamol (Aerolin)',
+    class: 'Broncodilatador (Beta-2 Agonista)',
+    indication: 'Asma, bronquite e DPOC.',
+    dosageAdult: '100mcg (1-2 jatos) até 4x ao dia.',
+    dosageChild: '100mcg (1 jato) até 4x ao dia.',
+    interactions: ['Betabloqueadores (ex: Atenolol)'],
+    contraindications: ['Hipersensibilidade'],
+    sideEffects: ['Tremor nas mãos', 'Taquicardia', 'Cãibras'],
+    notes: 'Medicamento de resgate para crises de falta de ar.'
+  },
+  {
+    name: 'Montelucaste de Sódio',
+    class: 'Antagonista de Receptor de Leucotrienos',
+    indication: 'Prevenção de asma e rinite alérgica.',
+    dosageAdult: '10mg uma vez ao dia (à noite).',
+    dosageChild: '4mg (2-5 anos) ou 5mg (6-14 anos).',
+    interactions: ['Fenobarbital', 'Rifampicina'],
+    contraindications: ['Hipersensibilidade'],
+    sideEffects: ['Cefaleia', 'Dor abdominal', 'Alterações de humor'],
+    notes: 'Não deve ser usado para tratar crises agudas de asma.'
+  },
+  {
+    name: 'Ciclobenzaprina (Miosan)',
+    class: 'Relaxante Muscular',
+    indication: 'Espasmos musculares e dor lombar.',
+    dosageAdult: '5mg a 10mg até 3x ao dia.',
+    dosageChild: 'Não recomendado para menores de 15 anos.',
+    interactions: ['IMAOs', 'Álcool', 'Antidepressivos'],
+    contraindications: ['Glaucoma', 'Hipertiroidismo', 'Infarto recente'],
+    sideEffects: ['Sonolência acentuada', 'Boca seca', 'Tontura'],
+    notes: 'Evitar dirigir ou operar máquinas sob efeito.'
+  },
+  {
+    name: 'Rivaroxabana (Xarelto)',
+    class: 'Anticoagulante (Inibidor do Fator Xa)',
+    indication: 'Prevenção de AVC e tratamento de trombose (TVP/EP).',
+    dosageAdult: '10mg a 20mg uma vez ao dia.',
+    dosageChild: 'Uso restrito.',
+    interactions: ['Cetoconazol', 'Ritonavir', 'AINEs'],
+    contraindications: ['Sangramento ativo', 'Doença hepática grave'],
+    sideEffects: ['Sangramentos', 'Tontura', 'Náusea'],
+    notes: 'Diferente da Varfarina, não exige monitoramento de RNI.'
+  },
+  {
+    name: 'Clopidogrel',
+    class: 'Antiagregante Plaquetário',
+    indication: 'Prevenção de infarto e AVC em pacientes de risco.',
+    dosageAdult: '75mg uma vez ao dia.',
+    dosageChild: 'Não recomendado.',
+    interactions: ['Omeprazol (reduz efeito)', 'AINEs'],
+    contraindications: ['Hemorragia ativa (ex: úlcera)'],
+    sideEffects: ['Hematomas', 'Sangramento nasal', 'Diarreia'],
+    notes: 'Geralmente usado após colocação de stent cardíaco.'
+  },
+  {
+    name: 'AAS (Aspirina)',
+    class: 'Antiagregante e Analgésico',
+    indication: 'Prevenção cardiovascular (100mg) ou dor/febre (500mg).',
+    dosageAdult: '100mg/dia (prevenção) ou 500mg a cada 6h (dor).',
+    dosageChild: 'Uso restrito (Risco de Síndrome de Reye).',
+    interactions: ['Anticoagulantes', 'Metotrexato', 'AINEs'],
+    contraindications: ['Úlcera gástrica', 'Dengue', 'Asma'],
+    sideEffects: ['Irritação gástrica', 'Sangramentos'],
+    notes: 'Evitar em crianças com sintomas virais (gripe/varicela).'
+  },
+  {
+    name: 'Zolpidem',
+    class: 'Hipnótico (Indutor do Sono)',
+    indication: 'Tratamento de curta duração para insônia.',
+    dosageAdult: '5mg a 10mg imediatamente antes de deitar.',
+    dosageChild: 'Não recomendado.',
+    interactions: ['Álcool', 'Outros depressores do SNC'],
+    contraindications: ['Insuficiência respiratória grave', 'Apneia do sono'],
+    sideEffects: ['Sonambulismo', 'Alucinações', 'Amnésia anterógrada'],
+    notes: 'Receita B1 (Azul) ou C1 (Branca 2 vias) dependendo da dosagem.'
+  },
+  {
+    name: 'Risperidona',
+    class: 'Antipsicótico Atípico',
+    indication: 'Esquizofrenia, irritabilidade no autismo, transtorno bipolar.',
+    dosageAdult: '2mg a 6mg ao dia.',
+    dosageChild: '0,25mg a 1mg (conforme peso/indicação).',
+    interactions: ['Levodopa', 'Fluoxetina'],
+    contraindications: ['Hipersensibilidade'],
+    sideEffects: ['Ganho de peso', 'Aumento da prolactina', 'Sedação'],
+    notes: 'Receita C1 (Branca 2 vias).'
+  },
+  {
+    name: 'Carbonato de Lítio',
+    class: 'Estabilizador de Humor',
+    indication: 'Transtorno Bipolar (Maníaco-Depressivo).',
+    dosageAdult: '300mg a 900mg ao dia (ajuste por litemia).',
+    dosageChild: 'Uso restrito.',
+    interactions: ['Diuréticos', 'AINEs', 'IECAs'],
+    contraindications: ['Doença renal grave', 'Desidratação grave'],
+    sideEffects: ['Tremores', 'Sede excessiva', 'Aumento da urina'],
+    notes: 'Receita C1. Exige exames de sangue regulares (Litemia).'
+  },
+  {
+    name: 'Sulfato Ferroso',
+    class: 'Suplemento Mineral (Ferro)',
+    indication: 'Anemia ferropriva e suplementação na gravidez.',
+    dosageAdult: '40mg a 60mg de ferro elementar ao dia.',
+    dosageChild: '3mg a 5mg/kg/dia.',
+    interactions: ['Antiácidos', 'Tetraciclinas', 'Levotiroxina'],
+    contraindications: ['Anemias não ferroprivas', 'Hemocromatose'],
+    sideEffects: ['Constipação', 'Fezes escuras (normal)', 'Dor abdominal'],
+    notes: 'Melhor absorvido com estômago vazio e Vitamina C (suco de laranja).'
   }
 ];
 
@@ -443,7 +630,10 @@ export const OFFLINE_INTERACTIONS: Interaction[] = [
   { drugs: 'Fluoxetina + Tramadol', level: 'Grave', effect: 'Risco de Síndrome Serotoninérgica.', risk: 'Confusão, agitação, tremores e febre.' },
   { drugs: 'Metformina + Contraste Iodado', level: 'Grave', effect: 'Risco de Acidose Láctica.', risk: 'Falência renal aguda.' },
   { drugs: 'Omeprazol + Clopidogrel', level: 'Moderado', effect: 'Redução da eficácia antiagregante do clopidogrel.', risk: 'Aumento do risco de eventos cardíacos.' },
-  { drugs: 'Lítio + Diuréticos/AINEs', level: 'Alto', effect: 'Aumento da toxicidade do Lítio.', risk: 'Dano neurológico e renal.' }
+  { drugs: 'Lítio + Diuréticos/AINEs', level: 'Alto', effect: 'Aumento da toxicidade do Lítio.', risk: 'Dano neurológico e renal.' },
+  { drugs: 'Levotiroxina + Cálcio/Ferro', level: 'Moderado', effect: 'Redução da absorção do hormônio tireoidiano.', risk: 'Ineficácia do tratamento do hipotireoidismo.' },
+  { drugs: 'Ciclobenzaprina + Álcool', level: 'Alto', effect: 'Potencialização da depressão do SNC.', risk: 'Sedação profunda e risco de acidentes.' },
+  { drugs: 'Rivaroxabana + Cetoconazol', level: 'Alto', effect: 'Aumento da exposição ao anticoagulante.', risk: 'Risco elevado de sangramentos graves.' }
 ];
 
 export const OFFLINE_LEGISLATION: Legislation[] = [
