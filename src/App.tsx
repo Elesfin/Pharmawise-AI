@@ -64,18 +64,20 @@ const getApiKey = () => {
 
 const SEARCH_SUGGESTIONS = [
   'Amoxicilina',
-  'Paracetamol posologia',
-  'Interações Sildenafila',
-  'Dipirona gotas dose',
-  'Ibuprofeno infantil',
-  'Omeprazol jejum',
-  'Varfarina interações',
-  'Azitromicina 500mg',
-  'Mounjaro indicação',
-  'Ozempic efeitos colaterais',
-  'Posologia Amoxicilina',
-  'Interações Varfarina',
-  'Dose Dipirona infantil'
+  'Azitromicina',
+  'Losartana',
+  'Omeprazol',
+  'Ibuprofeno',
+  'Metformina',
+  'Sinvastatina',
+  'Clonazepam',
+  'Fluoxetina',
+  'Nimesulida',
+  'Cefalexina',
+  'Atenolol',
+  'Domperidona',
+  'Portaria 344/98',
+  'RDC 20/2011'
 ];
 
 export default function App() {
@@ -196,7 +198,7 @@ export default function App() {
       if (error.message === 'API_KEY_MISSING') {
         errorMessage = '### 🔑 Erro de Configuração da API\n\nA chave da API do Gemini não foi detectada.\n\n**Como resolver:**\n1. Clique no ícone de **Configurações** (engrenagem) no menu lateral do AI Studio.\n2. Vá em **Secrets**.\n3. Certifique-se de que a `GEMINI_API_KEY` está configurada corretamente.\n4. Se você acabou de adicionar, tente atualizar a página.';
       } else if (error.message?.includes('quota') || error.message?.includes('429')) {
-        errorMessage = '### ⏳ Limite de Uso Atingido\n\nVocê atingiu o limite de uso gratuito do Gemini para este período.\n\n**O que fazer:**\n1. Aguarde alguns minutos ou horas para o limite resetar.\n2. Verifique se você está usando o modelo correto nas configurações.';
+        errorMessage = '### ⏳ Limite de Uso do Google Atingido\n\nEste aplicativo utiliza a API gratuita do Google Gemini, que possui um limite de perguntas por minuto e por dia.\n\n**Como aumentar seu limite:**\n1. O limite é controlado pelo Google, não pelo aplicativo.\n2. Para uso ilimitado ou maior frequência, você pode configurar uma conta de faturamento (Billing) no seu projeto do [Google AI Studio](https://aistudio.google.com/).\n3. Se estiver usando a chave gratuita, basta aguardar alguns minutos para que o Google libere novas perguntas.';
       }
       
       setMessages(prev => [
