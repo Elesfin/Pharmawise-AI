@@ -63,82 +63,24 @@ const getApiKey = () => {
   return key;
 };
 
-const SEARCH_SUGGESTIONS = [
-  'Amoxicilina',
-  'Azitromicina',
-  'Losartana',
-  'Omeprazol',
-  'Ibuprofeno',
-  'Metformina',
-  'Sinvastatina',
-  'Clonazepam',
-  'Fluoxetina',
-  'Nimesulida',
-  'Cefalexina',
-  'Atenolol',
-  'Domperidona',
-  'Levotiroxina',
-  'Ondansetrona',
-  'Rivaroxabana',
-  'Zolpidem',
-  'Ciclobenzaprina',
-  'Furosemida',
-  'Rosuvastatina',
-  'Venlafaxina',
-  'Pregabalina',
-  'Glifage',
-  'Tylenol',
-  'Novalgina',
-  'Advil',
-  'Clavulin',
-  'Selozok',
-  'Aradois',
-  'Hioscina',
-  'Prednisolona',
-  'Apixabana',
-  'Insulina NPH',
-  'Semaglutida',
-  'Topiramato',
-  'Amiodarona',
-  'Aché',
-  'EMS',
-  'Medley',
-  'Eurofarma',
-  'Libbs',
-  'Merck',
-  'Roche',
-  'Pfizer',
-  'Sanofi',
-  'Biolab',
-  'Bayer',
-  'Ozempic',
-  'Buscopan',
-  'Eliquis',
-  'Forxiga',
-  'Puran T4',
-  'Xarelto',
-  'Crestor',
-  'Lipitor',
-  'Nexium',
-  'Profenid',
-  'Flanax',
-  'Valium',
-  'Gardenal',
-  'Tegretol',
-  'Haldol',
-  'Zyprexa',
-  'Depakene',
-  'Lyrica',
-  'Allegra',
-  'Zyrtec',
-  'Decadron',
-  'Viagra',
-  'Cialis',
-  'Prolopa',
-  'Ericept',
-  'Portaria 344/98',
-  'RDC 20/2011'
+interface Suggestion {
+  label: string;
+  type: 'med' | 'brand' | 'lab' | 'leg' | 'int';
+}
+
+const SUGGESTION_DATA: Suggestion[] = [
+  ...OFFLINE_MEDS.map(m => ({ label: m.name, type: 'med' as const })),
+  ...OFFLINE_MEDS.flatMap(m => (m.brandNames || []).map(b => ({ label: b, type: 'brand' as const }))),
+  ...OFFLINE_MEDS.map(m => m.laboratory).filter((l): l is string => !!l).map(l => ({ label: l, type: 'lab' as const })),
+  ...OFFLINE_LEGISLATION.map(l => ({ label: l.title, type: 'leg' as const })),
+  ...OFFLINE_INTERACTIONS.map(i => ({ label: i.drugs, type: 'int' as const })),
+  { label: 'Portaria 344/98', type: 'leg' as const },
+  { label: 'RDC 20/2011', type: 'leg' as const }
 ];
+
+const SEARCH_SUGGESTIONS: Suggestion[] = Array.from(
+  SUGGESTION_DATA.reduce((map, item) => map.set(item.label, item), new Map<string, Suggestion>()).values()
+).sort((a, b) => a.label.localeCompare(b.label));
 
 export default function App() {
   const [messages, setMessages] = useState<Message[]>([
@@ -155,12 +97,23 @@ export default function App() {
   const [activeTab, setActiveTab] = useState<'meds' | 'interactions' | 'legislation'>('meds');
   const [isOnline, setIsOnline] = useState(navigator.onLine);
   const [statusNotification, setStatusNotification] = useState<{ message: string, type: 'online' | 'offline' } | null>(null);
-  const [filteredSuggestions, setFilteredSuggestions] = useState<string[]>([]);
+  const [filteredSuggestions, setFilteredSuggestions] = useState<Suggestion[]>([]);
   const [showSuggestions, setShowSuggestions] = useState(false);
   const [logoUrl, setLogoUrl] = useState<string | null>(null);
   const [isGeneratingLogo, setIsGeneratingLogo] = useState(false);
   const scrollRef = useRef<HTMLDivElement>(null);
   const messagesEndRef = useRef<HTMLDivElement>(null);
+  const suggestionsRef = useRef<HTMLDivElement>(null);
+
+  useEffect(() => {
+    const handleClickOutside = (event: MouseEvent) => {
+      if (suggestionsRef.current && !suggestionsRef.current.contains(event.target as Node)) {
+        setShowSuggestions(false);
+      }
+    };
+    document.addEventListener('mousedown', handleClickOutside);
+    return () => document.removeEventListener('mousedown', handleClickOutside);
+  }, []);
 
   useEffect(() => {
     const handleOnline = () => {
@@ -201,13 +154,15 @@ export default function App() {
     return () => clearTimeout(timeoutId);
   }, [messages, isLoading]);
 
-  const handleSend = async () => {
-    if (!input.trim() || isLoading) return;
+  const handleSend = async (overrideQuery?: string) => {
+    const query = overrideQuery || input;
+    if (!query.trim() || isLoading) return;
 
-    const userMessage = input.trim();
+    const userMessage = query.trim();
     const timestamp = new Date().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' });
     
     setInput('');
+    setShowSuggestions(false);
     setMessages(prev => [...prev, { 
       role: 'user', 
       content: userMessage, 
@@ -720,20 +675,35 @@ export default function App() {
               </div>
             )}
 
-            <div className="relative max-w-3xl mx-auto">
+            <div className="relative max-w-3xl mx-auto" ref={suggestionsRef}>
               {showSuggestions && filteredSuggestions.length > 0 && (
                 <div className="absolute bottom-full left-0 right-0 mb-2 bg-white border border-slate-200 rounded-2xl shadow-xl overflow-hidden z-50">
                   {filteredSuggestions.map((s, i) => (
                     <button
                       key={i}
                       onClick={() => {
-                        setInput(s);
+                        setInput(s.label);
                         setShowSuggestions(false);
+                        // Trigger search immediately
+                        handleSend(s.label);
                       }}
-                      className="w-full text-left px-4 py-3 text-sm hover:bg-slate-50 flex items-center gap-3 border-b border-slate-50 last:border-0"
+                      className="w-full text-left px-4 py-3 text-sm hover:bg-slate-50 flex items-center justify-between border-b border-slate-50 last:border-0 group"
                     >
-                      <Search className="w-4 h-4 text-slate-400" />
-                      {s}
+                      <div className="flex items-center gap-3">
+                        {s.type === 'med' && <Pill className="w-4 h-4 text-emerald-500" />}
+                        {s.type === 'brand' && <Sparkles className="w-4 h-4 text-amber-500" />}
+                        {s.type === 'lab' && <LayoutGrid className="w-4 h-4 text-blue-500" />}
+                        {s.type === 'leg' && <ShieldCheck className="w-4 h-4 text-slate-500" />}
+                        {s.type === 'int' && <AlertTriangle className="w-4 h-4 text-orange-500" />}
+                        <span className="font-medium text-slate-700">{s.label}</span>
+                      </div>
+                      <span className="text-[10px] font-bold uppercase tracking-wider text-slate-400 group-hover:text-slate-500">
+                        {s.type === 'med' && 'Medicamento'}
+                        {s.type === 'brand' && 'Referência'}
+                        {s.type === 'lab' && 'Laboratório'}
+                        {s.type === 'leg' && 'Legislação'}
+                        {s.type === 'int' && 'Interação'}
+                      </span>
                     </button>
                   ))}
                 </div>
@@ -744,9 +714,13 @@ export default function App() {
                   type="text"
                   value={input}
                   onChange={(e) => {
-                    setInput(e.target.value);
-                    if (e.target.value.length > 1) {
-                      setFilteredSuggestions(SEARCH_SUGGESTIONS.filter(s => s.toLowerCase().includes(e.target.value.toLowerCase())).slice(0, 5));
+                    const value = e.target.value;
+                    setInput(value);
+                    if (value.length > 1) {
+                      const filtered = SEARCH_SUGGESTIONS.filter(s => 
+                        s.label.toLowerCase().includes(value.toLowerCase())
+                      ).slice(0, 6);
+                      setFilteredSuggestions(filtered);
                       setShowSuggestions(true);
                     } else {
                       setShowSuggestions(false);
@@ -757,7 +731,7 @@ export default function App() {
                   className="flex-1 bg-transparent border-none focus:ring-0 px-4 py-2 text-sm"
                 />
                 <button
-                  onClick={handleSend}
+                  onClick={() => handleSend()}
                   disabled={!input.trim() || isLoading}
                   className="bg-emerald-600 hover:bg-emerald-700 disabled:bg-slate-200 text-white p-3 rounded-xl transition-all shadow-md shadow-emerald-200 disabled:shadow-none"
                 >
