@@ -618,6 +618,347 @@ export const OFFLINE_MEDS: Medication[] = [
     contraindications: ['Anemias não ferroprivas', 'Hemocromatose'],
     sideEffects: ['Constipação', 'Fezes escuras (normal)', 'Dor abdominal'],
     notes: 'Melhor absorvido com estômago vazio e Vitamina C (suco de laranja).'
+  },
+  {
+    name: 'Furosemida (Lasix)',
+    class: 'Diurético de Alça',
+    indication: 'Edema (inchaço) associado a insuficiência cardíaca, renal ou hepática; Hipertensão.',
+    dosageAdult: '20mg a 80mg ao dia.',
+    dosageChild: '1mg a 2mg/kg até o máximo de 6mg/kg.',
+    interactions: ['Aminoglicosídeos (ototoxicidade)', 'Lítio', 'Digoxina'],
+    contraindications: ['Insuficiência renal com anúria', 'Pré-coma hepático', 'Hipocalemia grave'],
+    sideEffects: ['Desidratação', 'Cãibras', 'Hipotensão', 'Perda de eletrólitos'],
+    notes: 'Pode causar perda acentuada de potássio. Tomar preferencialmente pela manhã.'
+  },
+  {
+    name: 'Glibenclamida',
+    class: 'Antidiabético (Sulfonilureia)',
+    indication: 'Diabetes Mellitus Tipo 2.',
+    dosageAdult: '2,5mg a 20mg ao dia.',
+    dosageChild: 'Não recomendado.',
+    interactions: ['Álcool', 'Miconazol', 'Aspirina'],
+    contraindications: ['Diabetes Tipo 1', 'Cetoacidose diabética', 'Gravidez'],
+    sideEffects: ['Hipoglicemia acentuada', 'Ganho de peso', 'Náusea'],
+    notes: 'Risco de hipoglicemia prolongada, especialmente em idosos.'
+  },
+  {
+    name: 'Rosuvastatina (Crestor)',
+    class: 'Hipolipemiante (Estatina)',
+    indication: 'Hipercolesterolemia e prevenção de eventos cardiovasculares.',
+    dosageAdult: '10mg a 40mg uma vez ao dia.',
+    dosageChild: 'Uso restrito.',
+    interactions: ['Ciclosporina', 'Varfarina', 'Antiácidos'],
+    contraindications: ['Doença hepática ativa', 'Insuficiência renal grave', 'Gravidez'],
+    sideEffects: ['Mialgia', 'Cefaleia', 'Astenia (fraqueza)'],
+    notes: 'Uma das estatinas mais potentes. Pode ser tomada em qualquer horário.'
+  },
+  {
+    name: 'Esomeprazol (Nexium)',
+    class: 'Inibidor da Bomba de Prótons (IBP)',
+    indication: 'Refluxo gastroesofágico, úlceras, erradicação de H. pylori.',
+    dosageAdult: '20mg a 40mg uma vez ao dia.',
+    dosageChild: 'Conforme peso (acima de 1 ano).',
+    interactions: ['Clopidogrel', 'Atazanavir', 'Digoxina'],
+    contraindications: ['Hipersensibilidade a benzimidazóis'],
+    sideEffects: ['Cefaleia', 'Diarreia', 'Dor abdominal'],
+    notes: 'Isômero do omeprazol com maior biodisponibilidade.'
+  },
+  {
+    name: 'Cetoprofeno (Profenid)',
+    class: 'Anti-inflamatório (AINE)',
+    indication: 'Dor inflamatória, artrite, artrose, dor pós-operatória.',
+    dosageAdult: '100mg a 200mg ao dia.',
+    dosageChild: 'Uso restrito.',
+    interactions: ['Anticoagulantes', 'Lítio', 'Metotrexato'],
+    contraindications: ['Úlcera ativa', 'Insuficiência cardíaca grave', 'Dengue'],
+    sideEffects: ['Gastrite', 'Náusea', 'Risco de sangramento'],
+    notes: 'Disponível em diversas formas (gotas, comprimidos, gel, injetável).'
+  },
+  {
+    name: 'Naproxeno (Flanax)',
+    class: 'Anti-inflamatório (AINE)',
+    indication: 'Dores musculares, articulares, dismenorreia, enxaqueca.',
+    dosageAdult: '250mg a 500mg a cada 12h.',
+    dosageChild: 'Uso restrito.',
+    interactions: ['Hidroclorotiazida', 'Varfarina'],
+    contraindications: ['Úlcera péptica', 'Asma induzida por AAS'],
+    sideEffects: ['Azia', 'Tontura', 'Retenção de líquidos'],
+    notes: 'Possui meia-vida longa, permitindo menos doses ao dia.'
+  },
+  {
+    name: 'Meloxicam',
+    class: 'Anti-inflamatório (AINE)',
+    indication: 'Artrite reumatoide e osteoartrite.',
+    dosageAdult: '7,5mg a 15mg uma vez ao dia.',
+    dosageChild: 'Não recomendado.',
+    interactions: ['Diuréticos', 'Colestiramina'],
+    contraindications: ['Insuficiência renal grave', 'Úlcera ativa'],
+    sideEffects: ['Dor abdominal', 'Diarreia', 'Anemia (raro)'],
+    notes: 'Mais seletivo para COX-2 que outros AINEs tradicionais.'
+  },
+  {
+    name: 'Venlafaxina (Efexor)',
+    class: 'Antidepressivo (IRSN)',
+    indication: 'Depressão, transtorno de ansiedade generalizada, fobia social.',
+    dosageAdult: '75mg a 225mg ao dia.',
+    dosageChild: 'Não recomendado.',
+    interactions: ['IMAOs', 'Erva-de-São-João', 'Triptanos'],
+    contraindications: ['Uso de IMAOs', 'Hipersensibilidade'],
+    sideEffects: ['Náusea', 'Boca seca', 'Sudorese', 'Aumento da pressão arterial'],
+    notes: 'Receita C1. Não interromper bruscamente (risco de síndrome de descontinuação).'
+  },
+  {
+    name: 'Duloxetina (Cymbalta)',
+    class: 'Antidepressivo (IRSN)',
+    indication: 'Depressão, ansiedade, dor neuropática diabética, fibromialgia.',
+    dosageAdult: '30mg a 60mg uma vez ao dia.',
+    dosageChild: 'Não recomendado.',
+    interactions: ['Fluvoxamina', 'Ciprofloxacino'],
+    contraindications: ['Doença hepática', 'Glaucoma de ângulo fechado'],
+    sideEffects: ['Náusea', 'Sonolência', 'Boca seca', 'Diminuição do apetite'],
+    notes: 'Receita C1. Muito eficaz em quadros de dor crônica associada à depressão.'
+  },
+  {
+    name: 'Paroxetina (Pondera)',
+    class: 'Antidepressivo (ISRS)',
+    indication: 'Depressão, TOC, pânico, fobia social, ansiedade generalizada.',
+    dosageAdult: '20mg a 50mg uma vez ao dia.',
+    dosageChild: 'Não recomendado.',
+    interactions: ['IMAOs', 'Triptofano', 'Varfarina'],
+    contraindications: ['Gravidez (Categoria D)', 'Uso de IMAOs'],
+    sideEffects: ['Disfunção sexual', 'Náusea', 'Sonolência', 'Ganho de peso'],
+    notes: 'Receita C1. Conhecida por ter uma síndrome de descontinuação mais intensa.'
+  },
+  {
+    name: 'Citalopram',
+    class: 'Antidepressivo (ISRS)',
+    indication: 'Depressão e transtorno do pânico.',
+    dosageAdult: '20mg a 40mg uma vez ao dia.',
+    dosageChild: 'Não recomendado.',
+    interactions: ['IMAOs', 'Linezolida', 'Pimozida'],
+    contraindications: ['Prolongamento do intervalo QT', 'Uso de IMAOs'],
+    sideEffects: ['Boca seca', 'Náusea', 'Sonolência', 'Aumento do suor'],
+    notes: 'Receita C1. Considerado um dos ISRS com menos interações.'
+  },
+  {
+    name: 'Diazepam (Valium)',
+    class: 'Benzodiazepínico (Psicotrópico)',
+    indication: 'Ansiedade, espasmos musculares, crises convulsivas, abstinência alcoólica.',
+    dosageAdult: '5mg a 10mg até 3x ao dia.',
+    dosageChild: 'Uso restrito.',
+    interactions: ['Álcool', 'Opioides', 'Cimetidina'],
+    contraindications: ['Miastenia gravis', 'Apneia do sono', 'Insuficiência hepática'],
+    sideEffects: ['Sonolência', 'Ataxia (falta de coordenação)', 'Dependência'],
+    notes: 'Receita B1 (Azul). Possui meia-vida muito longa.'
+  },
+  {
+    name: 'Haloperidol (Haldol)',
+    class: 'Antipsicótico Típico',
+    indication: 'Esquizofrenia, delírios, agitação psicomotora, tiques (Tourette).',
+    dosageAdult: '0,5mg a 20mg ao dia (conforme gravidade).',
+    dosageChild: 'Conforme peso e idade.',
+    interactions: ['Levodopa', 'Lítio', 'Álcool'],
+    contraindications: ['Doença de Parkinson', 'Coma', 'Depressão do SNC'],
+    sideEffects: ['Sintomas extrapiramidais (rigidez, tremores)', 'Discinesia'],
+    notes: 'Receita C1. Antipsicótico clássico de alta potência.'
+  },
+  {
+    name: 'Olanzapina (Zyprexa)',
+    class: 'Antipsicótico Atípico',
+    indication: 'Esquizofrenia e episódios de mania no transtorno bipolar.',
+    dosageAdult: '5mg a 20mg uma vez ao dia.',
+    dosageChild: 'Uso restrito.',
+    interactions: ['Fluvoxamina', 'Carbamazepina', 'Tabagismo'],
+    contraindications: ['Glaucoma de ângulo estreito'],
+    sideEffects: ['Ganho de peso significativo', 'Aumento de apetite', 'Sedação'],
+    notes: 'Receita C1. Monitorar perfil lipídico e glicêmico.'
+  },
+  {
+    name: 'Valproato de Sódio / Ácido Valproico (Depakene)',
+    class: 'Anticonvulsivante e Estabilizador de Humor',
+    indication: 'Epilepsia, transtorno bipolar e prevenção de enxaqueca.',
+    dosageAdult: '1000mg a 2000mg ao dia.',
+    dosageChild: '15mg a 60mg/kg/dia.',
+    interactions: ['Fenobarbital', 'Fenitoína', 'Aspirina'],
+    contraindications: ['Doença hepática', 'Gravidez (Alto risco de malformação)'],
+    sideEffects: ['Queda de cabelo', 'Ganho de peso', 'Náusea', 'Tremor'],
+    notes: 'Receita C1. Monitorar função hepática e hemograma.'
+  },
+  {
+    name: 'Carbamazepina (Tegretol)',
+    class: 'Anticonvulsivante',
+    indication: 'Epilepsia, neuralgia do trigêmeo, transtorno bipolar.',
+    dosageAdult: '200mg a 1200mg ao dia.',
+    dosageChild: '10mg a 20mg/kg/dia.',
+    interactions: ['MUITAS: Reduz efeito de anticoncepcionais, varfarina'],
+    contraindications: ['Bloqueio atrioventricular', 'Histórico de depressão de medula'],
+    sideEffects: ['Tontura', 'Sonolência', 'Visão dupla', 'Rash cutâneo'],
+    notes: 'Receita C1. É um potente indutor enzimático.'
+  },
+  {
+    name: 'Fenitoína (Hidantal)',
+    class: 'Anticonvulsivante',
+    indication: 'Crises convulsivas e estado de mal epilético.',
+    dosageAdult: '300mg a 400mg ao dia.',
+    dosageChild: '5mg a 8mg/kg/dia.',
+    interactions: ['Amiodarona', 'Cloranfenicol', 'Anticoncepcionais'],
+    contraindications: ['Bradicardia sinusal', 'Bloqueio sinoatrial'],
+    sideEffects: ['Hiperplasia gengival', 'Hirsutismo', 'Nistagmo', 'Ataxia'],
+    notes: 'Receita C1. Exige higiene bucal rigorosa devido à gengiva.'
+  },
+  {
+    name: 'Gabapentina',
+    class: 'Anticonvulsivante e Analgésico Neuropático',
+    indication: 'Dor neuropática e epilepsia.',
+    dosageAdult: '900mg a 3600mg ao dia.',
+    dosageChild: 'Uso restrito.',
+    interactions: ['Antiácidos (espaçar 2h)', 'Morfina'],
+    contraindications: ['Hipersensibilidade'],
+    sideEffects: ['Sonolência', 'Tontura', 'Fadiga', 'Edema periférico'],
+    notes: 'Receita C1. Muito utilizada para dor crônica (ex: herpes zoster).'
+  },
+  {
+    name: 'Pregabalina (Lyrica)',
+    class: 'Anticonvulsivante e Analgésico Neuropático',
+    indication: 'Dor neuropática, fibromialgia, transtorno de ansiedade generalizada.',
+    dosageAdult: '150mg a 600mg ao dia.',
+    dosageChild: 'Não recomendado.',
+    interactions: ['Oxicodona', 'Lorazepam', 'Álcool'],
+    contraindications: ['Hipersensibilidade'],
+    sideEffects: ['Tontura', 'Sonolência', 'Boca seca', 'Visão turva'],
+    notes: 'Receita C1. Frequentemente preferida à gabapentina pela posologia.'
+  },
+  {
+    name: 'Cetirizina (Zyrtec)',
+    class: 'Anti-histamínico (2ª Geração)',
+    indication: 'Rinite alérgica e urticária.',
+    dosageAdult: '10mg uma vez ao dia.',
+    dosageChild: '5mg a 10mg conforme idade.',
+    interactions: ['Teofilina'],
+    contraindications: ['Insuficiência renal grave'],
+    sideEffects: ['Sonolência leve (em alguns pacientes)', 'Fadiga'],
+    notes: 'Pode causar mais sonolência que a loratadina.'
+  },
+  {
+    name: 'Fexofenadina (Allegra)',
+    class: 'Anti-histamínico (2ª Geração)',
+    indication: 'Rinite alérgica e urticária idiopática crônica.',
+    dosageAdult: '60mg 2x/dia ou 120mg/180mg 1x/dia.',
+    dosageChild: '30mg 2x/dia (acima de 6 anos).',
+    interactions: ['Eritromicina', 'Cetoconazol', 'Suco de frutas'],
+    contraindications: ['Hipersensibilidade'],
+    sideEffects: ['Cefaleia', 'Sonolência (raro)', 'Náusea'],
+    notes: 'Considerado um dos anti-histamínicos que menos causa sono.'
+  },
+  {
+    name: 'Dexametasona (Decadron)',
+    class: 'Corticoide Potente',
+    indication: 'Processos inflamatórios, alérgicos, edema cerebral, COVID-19 grave.',
+    dosageAdult: '0,5mg a 10mg ao dia.',
+    dosageChild: '0,02mg a 0,3mg/kg/dia.',
+    interactions: ['Fenitoína', 'Rifampicina', 'Diuréticos'],
+    contraindications: ['Infecções fúngicas sistêmicas', 'Vacinas de vírus vivo'],
+    sideEffects: ['Insônia', 'Aumento de apetite', 'Hiperglicemia', 'Supressão adrenal'],
+    notes: 'Corticoide de longa duração e alta potência.'
+  },
+  {
+    name: 'Finasterida',
+    class: 'Inibidor da 5-alfa-redutase',
+    indication: 'Hiperplasia prostática benigna (5mg) e calvície masculina (1mg).',
+    dosageAdult: '1mg ou 5mg uma vez ao dia.',
+    dosageChild: 'Não indicado.',
+    interactions: ['Sem interações significativas conhecidas.'],
+    contraindications: ['Mulheres (especialmente grávidas - risco fetal)', 'Crianças'],
+    sideEffects: ['Diminuição da libido', 'Disfunção erétil', 'Ginecomastia'],
+    notes: 'Mulheres grávidas não devem sequer manipular comprimidos quebrados.'
+  },
+  {
+    name: 'Tamsulosina (Secotex)',
+    class: 'Antagonista Alfa-1 Adrenérgico',
+    indication: 'Sintomas da hiperplasia prostática benigna (HPB).',
+    dosageAdult: '0,4mg uma vez ao dia (após o café).',
+    dosageChild: 'Não indicado.',
+    interactions: ['Outros alfa-bloqueadores', 'Cimetidina'],
+    contraindications: ['Hipotensão ortostática', 'Insuficiência hepática grave'],
+    sideEffects: ['Tontura', 'Ejaculação retrógrada', 'Cefaleia'],
+    notes: 'Ajuda no relaxamento da musculatura da próstata e bexiga.'
+  },
+  {
+    name: 'Sildenafila (Viagra)',
+    class: 'Inibidor da PDE5',
+    indication: 'Disfunção erétil e hipertensão arterial pulmonar.',
+    dosageAdult: '25mg a 100mg (conforme necessidade, 1h antes).',
+    dosageChild: 'Uso restrito (HAP).',
+    interactions: ['Nitratos (Gravíssimo)', 'Ritonavir', 'Suco de toranja'],
+    contraindications: ['Uso de nitratos', 'Doença cardíaca grave'],
+    sideEffects: ['Cefaleia', 'Rubor facial', 'Dispepsia', 'Alteração visual'],
+    notes: 'NÃO tomar com nitratos (ex: Isordil, Monocordil) - Risco de morte.'
+  },
+  {
+    name: 'Tadalafila (Cialis)',
+    class: 'Inibidor da PDE5',
+    indication: 'Disfunção erétil, HPB e hipertensão pulmonar.',
+    dosageAdult: '5mg (uso diário) ou 20mg (sob demanda).',
+    dosageChild: 'Não indicado.',
+    interactions: ['Nitratos (Gravíssimo)', 'Cetoconazol'],
+    contraindications: ['Infarto recente', 'Angina instável', 'Uso de nitratos'],
+    sideEffects: ['Dor nas costas', 'Mialgia', 'Cefaleia', 'Congestão nasal'],
+    notes: 'Efeito dura até 36 horas ("pílula do fim de semana").'
+  },
+  {
+    name: 'Alendronato de Sódio',
+    class: 'Bisfosfonato',
+    indication: 'Osteoporose em mulheres pós-menopausa e em homens.',
+    dosageAdult: '70mg uma vez por semana.',
+    dosageChild: 'Não recomendado.',
+    interactions: ['Cálcio', 'Antiácidos', 'AINEs'],
+    contraindications: ['Anormalidades no esôfago', 'Incapacidade de ficar em pé/sentado por 30 min'],
+    sideEffects: ['Esofagite', 'Dor abdominal', 'Dor óssea/muscular'],
+    notes: 'Tomar em jejum com copo cheio de água e não deitar por 30 min.'
+  },
+  {
+    name: 'Ácido Fólico',
+    class: 'Vitamina (B9)',
+    indication: 'Anemia megaloblástica e prevenção de defeitos do tubo neural na gravidez.',
+    dosageAdult: '5mg ao dia (ou conforme orientação).',
+    dosageChild: 'Conforme orientação pediátrica.',
+    interactions: ['Metotrexato', 'Fenitoína'],
+    contraindications: ['Anemia perniciosa (sem B12)'],
+    sideEffects: ['Raro: Reações alérgicas'],
+    notes: 'Essencial para mulheres que desejam engravidar.'
+  },
+  {
+    name: 'Metoprolol (Selozok)',
+    class: 'Betabloqueador Seletivo',
+    indication: 'Hipertensão, angina, insuficiência cardíaca e após infarto.',
+    dosageAdult: '25mg a 200mg uma vez ao dia.',
+    dosageChild: 'Uso restrito.',
+    interactions: ['Verapamil', 'Diltiazem', 'Propafenona'],
+    contraindications: ['Bloqueio cardíaco de 2º ou 3º grau', 'Bradicardia severa'],
+    sideEffects: ['Cansaço', 'Tontura', 'Bradicardia', 'Mãos frias'],
+    notes: 'A formulação de succinato (Selozok) é de liberação controlada.'
+  },
+  {
+    name: 'Carvedilol',
+    class: 'Betabloqueador Não Seletivo e Alfa-1 Bloqueador',
+    indication: 'Insuficiência cardíaca, hipertensão e angina.',
+    dosageAdult: '3,125mg a 50mg 2x ao dia.',
+    dosageChild: 'Não recomendado.',
+    interactions: ['Digoxina', 'Insulina', 'Rifampicina'],
+    contraindications: ['Asma brônquica', 'DPOC grave', 'Insuficiência hepática'],
+    sideEffects: ['Tontura', 'Fadiga', 'Hipotensão postural'],
+    notes: 'Tomar com alimentos para reduzir o risco de queda de pressão.'
+  },
+  {
+    name: 'Lorazepam (Lorax)',
+    class: 'Benzodiazepínico',
+    indication: 'Ansiedade, insônia associada à ansiedade e sedação pré-operatória.',
+    dosageAdult: '1mg a 6mg ao dia divididos.',
+    dosageChild: 'Uso restrito.',
+    interactions: ['Álcool', 'Clozapina', 'Valproato'],
+    contraindications: ['Glaucoma de ângulo estreito', 'Insuficiência respiratória'],
+    sideEffects: ['Sedação', 'Tontura', 'Fraqueza muscular'],
+    notes: 'Receita B1 (Azul). Meia-vida intermediária.'
   }
 ];
 
@@ -632,8 +973,11 @@ export const OFFLINE_INTERACTIONS: Interaction[] = [
   { drugs: 'Omeprazol + Clopidogrel', level: 'Moderado', effect: 'Redução da eficácia antiagregante do clopidogrel.', risk: 'Aumento do risco de eventos cardíacos.' },
   { drugs: 'Lítio + Diuréticos/AINEs', level: 'Alto', effect: 'Aumento da toxicidade do Lítio.', risk: 'Dano neurológico e renal.' },
   { drugs: 'Levotiroxina + Cálcio/Ferro', level: 'Moderado', effect: 'Redução da absorção do hormônio tireoidiano.', risk: 'Ineficácia do tratamento do hipotireoidismo.' },
-  { drugs: 'Ciclobenzaprina + Álcool', level: 'Alto', effect: 'Potencialização da depressão do SNC.', risk: 'Sedação profunda e risco de acidentes.' },
-  { drugs: 'Rivaroxabana + Cetoconazol', level: 'Alto', effect: 'Aumento da exposição ao anticoagulante.', risk: 'Risco elevado de sangramentos graves.' }
+  { drugs: 'Ciclobenzaprina + Álcool', level: 'Alto', effect: 'Potencialização da depression do SNC.', risk: 'Sedação profunda e risco de acidentes.' },
+  { drugs: 'Rivaroxabana + Cetoconazol', level: 'Alto', effect: 'Aumento da exposição ao anticoagulante.', risk: 'Risco elevado de sangramentos graves.' },
+  { drugs: 'Carbamazepina + Anticoncepcional', level: 'Alto', effect: 'Indução enzimática reduz níveis do contraceptivo.', risk: 'Falha na contracepção.' },
+  { drugs: 'Fenitoína + Varfarina', level: 'Grave', effect: 'Alteração complexa no tempo de coagulação.', risk: 'Risco de sangramento ou trombose.' },
+  { drugs: 'Dexametasona + Antidiabéticos', level: 'Moderado', effect: 'Corticoide aumenta a glicemia.', risk: 'Descontrole do diabetes.' }
 ];
 
 export const OFFLINE_LEGISLATION: Legislation[] = [

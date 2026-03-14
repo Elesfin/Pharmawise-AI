@@ -52,6 +52,7 @@ interface Message {
   content: string;
   timestamp: string;
   status?: 'sending' | 'sent' | 'read';
+  isLocal?: boolean;
 }
 
 const getApiKey = () => {
@@ -81,6 +82,10 @@ const SEARCH_SUGGESTIONS = [
   'Rivaroxabana',
   'Zolpidem',
   'Ciclobenzaprina',
+  'Furosemida',
+  'Rosuvastatina',
+  'Venlafaxina',
+  'Pregabalina',
   'Portaria 344/98',
   'RDC 20/2011'
 ];
@@ -99,6 +104,7 @@ export default function App() {
   const [showReference, setShowReference] = useState(false);
   const [activeTab, setActiveTab] = useState<'meds' | 'interactions' | 'legislation'>('meds');
   const [isOnline, setIsOnline] = useState(navigator.onLine);
+  const [statusNotification, setStatusNotification] = useState<{ message: string, type: 'online' | 'offline' } | null>(null);
   const [filteredSuggestions, setFilteredSuggestions] = useState<string[]>([]);
   const [showSuggestions, setShowSuggestions] = useState(false);
   const [logoUrl, setLogoUrl] = useState<string | null>(null);
@@ -107,8 +113,16 @@ export default function App() {
   const messagesEndRef = useRef<HTMLDivElement>(null);
 
   useEffect(() => {
-    const handleOnline = () => setIsOnline(true);
-    const handleOffline = () => setIsOnline(false);
+    const handleOnline = () => {
+      setIsOnline(true);
+      setStatusNotification({ message: 'Conexão restaurada! Modo online ativado.', type: 'online' });
+      setTimeout(() => setStatusNotification(null), 5000);
+    };
+    const handleOffline = () => {
+      setIsOnline(false);
+      setStatusNotification({ message: 'Você está offline. Usando base de dados local.', type: 'offline' });
+      setTimeout(() => setStatusNotification(null), 5000);
+    };
     window.addEventListener('online', handleOnline);
     window.addEventListener('offline', handleOffline);
     return () => {
@@ -171,7 +185,8 @@ export default function App() {
             role: 'assistant', 
             content: offlineResponse, 
             timestamp: new Date().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' }),
-            status: 'read' as const
+            status: 'read' as const,
+            isLocal: isDirectMatch
           }
         ]);
         setIsLoading(false);
@@ -260,7 +275,7 @@ export default function App() {
     }
 
     if (results.length > 0) {
-      return `### 📚 Base Local (Emergência)\n\n${results.join('\n\n---\n\n')}\n\n*Nota: Esta resposta foi gerada a partir do banco de dados local enquanto a API está sendo configurada.*`;
+      return `### 📚 Informação da Base Local\n\n${results.join('\n\n---\n\n')}\n\n*Nota: Esta resposta foi extraída diretamente do banco de dados offline do PharmaWise.*`;
     }
 
     return `Sinto muito, não encontrei informações sobre "${query}" na base local.`;
@@ -314,6 +329,28 @@ export default function App() {
 
   return (
     <div className="flex flex-col h-screen bg-[#F8FAFC] font-sans text-slate-900">
+      {/* Status Notification */}
+      <AnimatePresence>
+        {statusNotification && (
+          <motion.div
+            initial={{ y: -50, opacity: 0 }}
+            animate={{ y: 20, opacity: 1 }}
+            exit={{ y: -50, opacity: 0 }}
+            className="fixed top-0 left-1/2 -translate-x-1/2 z-50 pointer-events-none"
+          >
+            <div className={cn(
+              "px-6 py-3 rounded-2xl shadow-2xl border flex items-center gap-3",
+              statusNotification.type === 'online' 
+                ? "bg-emerald-600 text-white border-emerald-500" 
+                : "bg-amber-600 text-white border-amber-500"
+            )}>
+              {statusNotification.type === 'online' ? <Wifi className="w-5 h-5" /> : <WifiOff className="w-5 h-5" />}
+              <span className="text-sm font-bold">{statusNotification.message}</span>
+            </div>
+          </motion.div>
+        )}
+      </AnimatePresence>
+
       {/* Header */}
       <header className="bg-white border-b border-slate-200 px-6 py-4 flex items-center justify-between sticky top-0 z-10 shadow-sm">
         <div className="flex items-center gap-3">
@@ -476,6 +513,11 @@ export default function App() {
                     ? "bg-emerald-600 text-white rounded-tr-none" 
                     : "bg-white border border-slate-100 text-slate-800 rounded-tl-none"
                 )}>
+                  {msg.isLocal && (
+                    <div className="absolute -top-2 -right-2 bg-emerald-100 text-emerald-700 text-[9px] font-bold px-2 py-0.5 rounded-full border border-emerald-200 shadow-sm z-10">
+                      BASE LOCAL
+                    </div>
+                  )}
                   <div className={cn(
                     "prose prose-sm max-w-none",
                     msg.role === 'user' ? "prose-invert" : "prose-slate"
