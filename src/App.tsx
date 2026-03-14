@@ -86,6 +86,45 @@ const SEARCH_SUGGESTIONS = [
   'Rosuvastatina',
   'Venlafaxina',
   'Pregabalina',
+  'Glifage',
+  'Tylenol',
+  'Novalgina',
+  'Advil',
+  'Clavulin',
+  'Selozok',
+  'Aradois',
+  'Hioscina',
+  'Prednisolona',
+  'Apixabana',
+  'Insulina NPH',
+  'Semaglutida',
+  'Topiramato',
+  'Amiodarona',
+  'Ozempic',
+  'Buscopan',
+  'Eliquis',
+  'Forxiga',
+  'Puran T4',
+  'Xarelto',
+  'Crestor',
+  'Lipitor',
+  'Nexium',
+  'Profenid',
+  'Flanax',
+  'Valium',
+  'Gardenal',
+  'Tegretol',
+  'Haldol',
+  'Zyprexa',
+  'Depakene',
+  'Lyrica',
+  'Allegra',
+  'Zyrtec',
+  'Decadron',
+  'Viagra',
+  'Cialis',
+  'Prolopa',
+  'Ericept',
   'Portaria 344/98',
   'RDC 20/2011'
 ];
@@ -246,18 +285,25 @@ export default function App() {
   const searchOffline = (query: string): string => {
     const q = normalizeText(query);
     let results: string[] = [];
+    const foundMeds = new Set<Medication>();
 
     // Exact Match
     const exactMed = MEDS_MAP.get(q);
     if (exactMed) {
-      results.push(`### 💊 ${exactMed.name}\n**Classe:** ${exactMed.class}\n**Indicação:** ${exactMed.indication}\n\n**Posologia:**\n- Adulto: ${exactMed.dosageAdult}\n- Criança: ${exactMed.dosageChild}\n\n**Interações:** ${exactMed.interactions.join(', ')}\n**Notas:** ${exactMed.notes}`);
+      const brandInfo = exactMed.brandNames ? `\n**Nomes Fantasia:** ${exactMed.brandNames.join(', ')}` : '';
+      results.push(`### 💊 ${exactMed.name}${brandInfo}\n**Classe:** ${exactMed.class}\n**Indicação:** ${exactMed.indication}\n\n**Posologia:**\n- Adulto: ${exactMed.dosageAdult}\n- Criança: ${exactMed.dosageChild}\n\n**Interações:** ${exactMed.interactions.join(', ')}\n**Notas:** ${exactMed.notes}`);
+      foundMeds.add(exactMed);
     }
 
-    // Keyword Search
+    // Keyword Search (only if no exact match or to find related)
     if (results.length === 0) {
       SEARCH_INDEX.meds.forEach(m => {
         if (m.name.includes(q) || q.includes(m.name)) {
-          results.push(`### 💊 ${m.data.name}\n**Classe:** ${m.data.class}\n**Posologia Adulto:** ${m.data.dosageAdult}`);
+          if (!foundMeds.has(m.data)) {
+            const brandInfo = m.data.brandNames ? `\n**Nomes Fantasia:** ${m.data.brandNames.join(', ')}` : '';
+            results.push(`### 💊 ${m.data.name}${brandInfo}\n**Classe:** ${m.data.class}\n**Posologia Adulto:** ${m.data.dosageAdult}`);
+            foundMeds.add(m.data);
+          }
         }
       });
 

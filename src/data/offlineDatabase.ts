@@ -5,6 +5,7 @@
 
 export interface Medication {
   name: string;
+  brandNames?: string[];
   class: string;
   indication: string;
   dosageAdult: string;
@@ -35,6 +36,7 @@ export const OFFLINE_MEDS: Medication[] = [
   // --- ANTIBIÓTICOS (RDC 20/2011) ---
   {
     name: 'Amoxicilina',
+    brandNames: ['Amoxil', 'Novamox', 'Velamox'],
     class: 'Antibiótico (Penicilina)',
     indication: 'Infecções bacterianas (garganta, ouvido, sinusite).',
     dosageAdult: '500mg a 1g a cada 8h ou 12h.',
@@ -46,6 +48,7 @@ export const OFFLINE_MEDS: Medication[] = [
   },
   {
     name: 'Amoxicilina + Clavulanato',
+    brandNames: ['Clavulin', 'Sigma-Clav', 'Sinot'],
     class: 'Antibiótico (Penicilina + Inibidor de Beta-lactamase)',
     indication: 'Infecções resistentes, sinusites, pneumonias, mordidas.',
     dosageAdult: '500/125mg 3x/dia ou 875/125mg 2x/dia.',
@@ -57,6 +60,7 @@ export const OFFLINE_MEDS: Medication[] = [
   },
   {
     name: 'Azitromicina',
+    brandNames: ['Astro', 'Zitromax', 'Azitromed'],
     class: 'Antibiótico (Macrolídeo)',
     indication: 'Infecções respiratórias, DSTs, infecções de pele.',
     dosageAdult: '500mg uma vez ao dia por 3 a 5 dias.',
@@ -68,6 +72,7 @@ export const OFFLINE_MEDS: Medication[] = [
   },
   {
     name: 'Cefalexina',
+    brandNames: ['Keflex', 'Cefacimed', 'Cefagel'],
     class: 'Antibiótico (Cefalosporina)',
     indication: 'Infecções de pele, urinárias e respiratórias.',
     dosageAdult: '500mg a cada 6h.',
@@ -79,6 +84,7 @@ export const OFFLINE_MEDS: Medication[] = [
   },
   {
     name: 'Ciprofloxacino',
+    brandNames: ['Cipro', 'Ciloxan', 'Quinoflox'],
     class: 'Antibiótico (Quinolona)',
     indication: 'Infecções urinárias graves, prostatites, diarreia bacteriana.',
     dosageAdult: '500mg a 750mg a cada 12h.',
@@ -103,6 +109,7 @@ export const OFFLINE_MEDS: Medication[] = [
   // --- ANTI-HIPERTENSIVOS E CARDIO ---
   {
     name: 'Losartana Potássica',
+    brandNames: ['Aradois', 'Cozaar', 'Torlós'],
     class: 'Anti-hipertensivo (BRA)',
     indication: 'Hipertensão arterial e insuficiência cardíaca.',
     dosageAdult: '50mg a 100mg uma vez ao dia.',
@@ -114,6 +121,7 @@ export const OFFLINE_MEDS: Medication[] = [
   },
   {
     name: 'Atenolol',
+    brandNames: ['Ablok', 'Atenorese', 'Angipress'],
     class: 'Anti-hipertensivo (Betabloqueador)',
     indication: 'Hipertensão, arritmias, angina.',
     dosageAdult: '25mg a 100mg uma vez ao dia.',
@@ -125,6 +133,7 @@ export const OFFLINE_MEDS: Medication[] = [
   },
   {
     name: 'Anlodipino',
+    brandNames: ['Norvasc', 'Pressat', 'Nicord'],
     class: 'Anti-hipertensivo (Bloqueador de Canais de Cálcio)',
     indication: 'Hipertensão e angina.',
     dosageAdult: '5mg a 10mg uma vez ao dia.',
@@ -136,6 +145,7 @@ export const OFFLINE_MEDS: Medication[] = [
   },
   {
     name: 'Enalapril',
+    brandNames: ['Renitec', 'Eupressin', 'Atens'],
     class: 'Anti-hipertensivo (IECA)',
     indication: 'Hipertensão e insuficiência cardíaca.',
     dosageAdult: '5mg a 40mg ao dia (1 ou 2 doses).',
@@ -147,6 +157,7 @@ export const OFFLINE_MEDS: Medication[] = [
   },
   {
     name: 'Hidroclorotiazida',
+    brandNames: ['Clorana', 'Hidromed', 'Drenidra'],
     class: 'Diurético Tiazídico',
     indication: 'Hipertensão e edema.',
     dosageAdult: '12,5mg a 50mg uma vez ao dia (manhã).',
@@ -158,6 +169,7 @@ export const OFFLINE_MEDS: Medication[] = [
   },
   {
     name: 'Espironolactona',
+    brandNames: ['Aldactone', 'Espironol', 'Diurisa'],
     class: 'Diurético Poupador de Potássio',
     indication: 'Hipertensão, edema, insuficiência cardíaca, acne hormonal.',
     dosageAdult: '25mg a 100mg ao dia.',
@@ -171,6 +183,7 @@ export const OFFLINE_MEDS: Medication[] = [
   // --- DIABETES ---
   {
     name: 'Metformina',
+    brandNames: ['Glifage', 'Glucoformin', 'Diaformin'],
     class: 'Antidiabético Oral (Biguanida)',
     indication: 'Diabetes Mellitus Tipo 2.',
     dosageAdult: '500mg a 850mg 2 a 3x ao dia.',
@@ -182,6 +195,7 @@ export const OFFLINE_MEDS: Medication[] = [
   },
   {
     name: 'Gliclazida',
+    brandNames: ['Diamicron', 'Gliconil', 'Azukon'],
     class: 'Antidiabético (Sulfonilureia)',
     indication: 'Diabetes Mellitus Tipo 2.',
     dosageAdult: '30mg a 120mg uma vez ao dia (café da manhã).',
@@ -195,6 +209,7 @@ export const OFFLINE_MEDS: Medication[] = [
   // --- COLESTEROL ---
   {
     name: 'Sinvastatina',
+    brandNames: ['Zocor', 'Sinvastacor', 'Vaslip'],
     class: 'Hipolipemiante (Estatina)',
     indication: 'Colesterol alto e prevenção cardiovascular.',
     dosageAdult: '10mg a 40mg uma vez ao dia (à noite).',
@@ -206,6 +221,7 @@ export const OFFLINE_MEDS: Medication[] = [
   },
   {
     name: 'Atorvastatina',
+    brandNames: ['Lipitor', 'Citalor', 'Torval'],
     class: 'Hipolipemiante (Estatina)',
     indication: 'Colesterol alto e prevenção de eventos cardíacos.',
     dosageAdult: '10mg a 80mg uma vez ao dia.',
@@ -219,6 +235,7 @@ export const OFFLINE_MEDS: Medication[] = [
   // --- GASTRO ---
   {
     name: 'Omeprazol',
+    brandNames: ['Losec', 'Victrix', 'Gastrium'],
     class: 'Inibidor da Bomba de Prótons (IBP)',
     indication: 'Gastrite, úlcera, refluxo gastroesofágico.',
     dosageAdult: '20mg a 40mg uma vez ao dia em jejum.',
@@ -230,6 +247,7 @@ export const OFFLINE_MEDS: Medication[] = [
   },
   {
     name: 'Pantoprazol',
+    brandNames: ['Pantozol', 'Peptulan', 'Panto-Calm'],
     class: 'Inibidor da Bomba de Prótons (IBP)',
     indication: 'Gastrite, refluxo, proteção gástrica.',
     dosageAdult: '20mg a 40mg uma vez ao dia em jejum.',
@@ -241,6 +259,7 @@ export const OFFLINE_MEDS: Medication[] = [
   },
   {
     name: 'Domperidona',
+    brandNames: ['Motilium', 'Peridal', 'Domperix'],
     class: 'Antiemético e Procinético',
     indication: 'Náuseas, vômitos, má digestão.',
     dosageAdult: '10mg até 3x ao dia.',
@@ -252,6 +271,7 @@ export const OFFLINE_MEDS: Medication[] = [
   },
   {
     name: 'Bromoprida',
+    brandNames: ['Digesan', 'Plamet', 'Bromoprid'],
     class: 'Antiemético e Procinético',
     indication: 'Náuseas, vômitos, distúrbios da motilidade digestiva.',
     dosageAdult: '10mg 3x ao dia ou 1 gota/kg (gotas).',
@@ -265,6 +285,7 @@ export const OFFLINE_MEDS: Medication[] = [
   // --- DOR E INFLAMAÇÃO ---
   {
     name: 'Dipirona',
+    brandNames: ['Novalgina', 'Anador', 'Magnopyrol'],
     class: 'Analgésico e Antitérmico',
     indication: 'Dor e febre.',
     dosageAdult: '500mg a 1g até 4x ao dia.',
@@ -276,6 +297,7 @@ export const OFFLINE_MEDS: Medication[] = [
   },
   {
     name: 'Paracetamol',
+    brandNames: ['Tylenol', 'Vick Pyrena', 'Dôrico'],
     class: 'Analgésico e Antitérmico',
     indication: 'Dor leve a moderada e febre.',
     dosageAdult: '500mg a 1g a cada 4-6h (Máx 4g/dia).',
@@ -287,6 +309,7 @@ export const OFFLINE_MEDS: Medication[] = [
   },
   {
     name: 'Ibuprofeno',
+    brandNames: ['Advil', 'Alivium', 'Ibusal'],
     class: 'Anti-inflamatório Não Esteroidal (AINE)',
     indication: 'Inflamação, dor e febre.',
     dosageAdult: '400mg a 600mg a cada 6-8h.',
@@ -510,7 +533,8 @@ export const OFFLINE_MEDS: Medication[] = [
     notes: 'Metabólito ativo da loratadina, não causa sonolência.'
   },
   {
-    name: 'Salbutamol (Aerolin)',
+    name: 'Salbutamol',
+    brandNames: ['Aerolin', 'Sabumalin'],
     class: 'Broncodilatador (Beta-2 Agonista)',
     indication: 'Asma, bronquite e DPOC.',
     dosageAdult: '100mcg (1-2 jatos) até 4x ao dia.',
@@ -543,7 +567,8 @@ export const OFFLINE_MEDS: Medication[] = [
     notes: 'Evitar dirigir ou operar máquinas sob efeito.'
   },
   {
-    name: 'Rivaroxabana (Xarelto)',
+    name: 'Rivaroxabana',
+    brandNames: ['Xarelto', 'Rivarox'],
     class: 'Anticoagulante (Inibidor do Fator Xa)',
     indication: 'Prevenção de AVC e tratamento de trombose (TVP/EP).',
     dosageAdult: '10mg a 20mg uma vez ao dia.',
@@ -620,7 +645,8 @@ export const OFFLINE_MEDS: Medication[] = [
     notes: 'Melhor absorvido com estômago vazio e Vitamina C (suco de laranja).'
   },
   {
-    name: 'Furosemida (Lasix)',
+    name: 'Furosemida',
+    brandNames: ['Lasix', 'Furosemid'],
     class: 'Diurético de Alça',
     indication: 'Edema (inchaço) associado a insuficiência cardíaca, renal ou hepática; Hipertensão.',
     dosageAdult: '20mg a 80mg ao dia.',
@@ -642,7 +668,8 @@ export const OFFLINE_MEDS: Medication[] = [
     notes: 'Risco de hipoglicemia prolongada, especialmente em idosos.'
   },
   {
-    name: 'Rosuvastatina (Crestor)',
+    name: 'Rosuvastatina',
+    brandNames: ['Crestor', 'Rosuvas'],
     class: 'Hipolipemiante (Estatina)',
     indication: 'Hipercolesterolemia e prevenção de eventos cardiovasculares.',
     dosageAdult: '10mg a 40mg uma vez ao dia.',
@@ -653,7 +680,8 @@ export const OFFLINE_MEDS: Medication[] = [
     notes: 'Uma das estatinas mais potentes. Pode ser tomada em qualquer horário.'
   },
   {
-    name: 'Esomeprazol (Nexium)',
+    name: 'Esomeprazol',
+    brandNames: ['Nexium', 'Esomex'],
     class: 'Inibidor da Bomba de Prótons (IBP)',
     indication: 'Refluxo gastroesofágico, úlceras, erradicação de H. pylori.',
     dosageAdult: '20mg a 40mg uma vez ao dia.',
@@ -664,7 +692,8 @@ export const OFFLINE_MEDS: Medication[] = [
     notes: 'Isômero do omeprazol com maior biodisponibilidade.'
   },
   {
-    name: 'Cetoprofeno (Profenid)',
+    name: 'Cetoprofeno',
+    brandNames: ['Profenid', 'Artrosil'],
     class: 'Anti-inflamatório (AINE)',
     indication: 'Dor inflamatória, artrite, artrose, dor pós-operatória.',
     dosageAdult: '100mg a 200mg ao dia.',
@@ -675,7 +704,8 @@ export const OFFLINE_MEDS: Medication[] = [
     notes: 'Disponível em diversas formas (gotas, comprimidos, gel, injetável).'
   },
   {
-    name: 'Naproxeno (Flanax)',
+    name: 'Naproxeno',
+    brandNames: ['Flanax', 'Naprosyn'],
     class: 'Anti-inflamatório (AINE)',
     indication: 'Dores musculares, articulares, dismenorreia, enxaqueca.',
     dosageAdult: '250mg a 500mg a cada 12h.',
@@ -687,6 +717,7 @@ export const OFFLINE_MEDS: Medication[] = [
   },
   {
     name: 'Meloxicam',
+    brandNames: ['Movalis', 'Melocox'],
     class: 'Anti-inflamatório (AINE)',
     indication: 'Artrite reumatoide e osteoartrite.',
     dosageAdult: '7,5mg a 15mg uma vez ao dia.',
@@ -697,7 +728,8 @@ export const OFFLINE_MEDS: Medication[] = [
     notes: 'Mais seletivo para COX-2 que outros AINEs tradicionais.'
   },
   {
-    name: 'Venlafaxina (Efexor)',
+    name: 'Venlafaxina',
+    brandNames: ['Efexor', 'Alenthus'],
     class: 'Antidepressivo (IRSN)',
     indication: 'Depressão, transtorno de ansiedade generalizada, fobia social.',
     dosageAdult: '75mg a 225mg ao dia.',
@@ -708,7 +740,8 @@ export const OFFLINE_MEDS: Medication[] = [
     notes: 'Receita C1. Não interromper bruscamente (risco de síndrome de descontinuação).'
   },
   {
-    name: 'Duloxetina (Cymbalta)',
+    name: 'Duloxetina',
+    brandNames: ['Cymbalta', 'Velija'],
     class: 'Antidepressivo (IRSN)',
     indication: 'Depressão, ansiedade, dor neuropática diabética, fibromialgia.',
     dosageAdult: '30mg a 60mg uma vez ao dia.',
@@ -719,7 +752,8 @@ export const OFFLINE_MEDS: Medication[] = [
     notes: 'Receita C1. Muito eficaz em quadros de dor crônica associada à depressão.'
   },
   {
-    name: 'Paroxetina (Pondera)',
+    name: 'Paroxetina',
+    brandNames: ['Pondera', 'Paxil'],
     class: 'Antidepressivo (ISRS)',
     indication: 'Depressão, TOC, pânico, fobia social, ansiedade generalizada.',
     dosageAdult: '20mg a 50mg uma vez ao dia.',
@@ -731,6 +765,7 @@ export const OFFLINE_MEDS: Medication[] = [
   },
   {
     name: 'Citalopram',
+    brandNames: ['Cipramil', 'Città'],
     class: 'Antidepressivo (ISRS)',
     indication: 'Depressão e transtorno do pânico.',
     dosageAdult: '20mg a 40mg uma vez ao dia.',
@@ -741,7 +776,8 @@ export const OFFLINE_MEDS: Medication[] = [
     notes: 'Receita C1. Considerado um dos ISRS com menos interações.'
   },
   {
-    name: 'Diazepam (Valium)',
+    name: 'Diazepam',
+    brandNames: ['Valium', 'Dienpax'],
     class: 'Benzodiazepínico (Psicotrópico)',
     indication: 'Ansiedade, espasmos musculares, crises convulsivas, abstinência alcoólica.',
     dosageAdult: '5mg a 10mg até 3x ao dia.',
@@ -752,7 +788,8 @@ export const OFFLINE_MEDS: Medication[] = [
     notes: 'Receita B1 (Azul). Possui meia-vida muito longa.'
   },
   {
-    name: 'Haloperidol (Haldol)',
+    name: 'Haloperidol',
+    brandNames: ['Haldol'],
     class: 'Antipsicótico Típico',
     indication: 'Esquizofrenia, delírios, agitação psicomotora, tiques (Tourette).',
     dosageAdult: '0,5mg a 20mg ao dia (conforme gravidade).',
@@ -763,7 +800,8 @@ export const OFFLINE_MEDS: Medication[] = [
     notes: 'Receita C1. Antipsicótico clássico de alta potência.'
   },
   {
-    name: 'Olanzapina (Zyprexa)',
+    name: 'Olanzapina',
+    brandNames: ['Zyprexa', 'Zap'],
     class: 'Antipsicótico Atípico',
     indication: 'Esquizofrenia e episódios de mania no transtorno bipolar.',
     dosageAdult: '5mg a 20mg uma vez ao dia.',
@@ -774,7 +812,8 @@ export const OFFLINE_MEDS: Medication[] = [
     notes: 'Receita C1. Monitorar perfil lipídico e glicêmico.'
   },
   {
-    name: 'Valproato de Sódio / Ácido Valproico (Depakene)',
+    name: 'Valproato de Sódio',
+    brandNames: ['Depakene', 'Torval', 'Valpakine'],
     class: 'Anticonvulsivante e Estabilizador de Humor',
     indication: 'Epilepsia, transtorno bipolar e prevenção de enxaqueca.',
     dosageAdult: '1000mg a 2000mg ao dia.',
@@ -785,7 +824,8 @@ export const OFFLINE_MEDS: Medication[] = [
     notes: 'Receita C1. Monitorar função hepática e hemograma.'
   },
   {
-    name: 'Carbamazepina (Tegretol)',
+    name: 'Carbamazepina',
+    brandNames: ['Tegretol', 'Tegretard'],
     class: 'Anticonvulsivante',
     indication: 'Epilepsia, neuralgia do trigêmeo, transtorno bipolar.',
     dosageAdult: '200mg a 1200mg ao dia.',
@@ -796,7 +836,8 @@ export const OFFLINE_MEDS: Medication[] = [
     notes: 'Receita C1. É um potente indutor enzimático.'
   },
   {
-    name: 'Fenitoína (Hidantal)',
+    name: 'Fenitoína',
+    brandNames: ['Hidantal', 'Epamin'],
     class: 'Anticonvulsivante',
     indication: 'Crises convulsivas e estado de mal epilético.',
     dosageAdult: '300mg a 400mg ao dia.',
@@ -808,6 +849,7 @@ export const OFFLINE_MEDS: Medication[] = [
   },
   {
     name: 'Gabapentina',
+    brandNames: ['Neurontin', 'Progab'],
     class: 'Anticonvulsivante e Analgésico Neuropático',
     indication: 'Dor neuropática e epilepsia.',
     dosageAdult: '900mg a 3600mg ao dia.',
@@ -818,7 +860,8 @@ export const OFFLINE_MEDS: Medication[] = [
     notes: 'Receita C1. Muito utilizada para dor crônica (ex: herpes zoster).'
   },
   {
-    name: 'Pregabalina (Lyrica)',
+    name: 'Pregabalina',
+    brandNames: ['Lyrica', 'Prebictal'],
     class: 'Anticonvulsivante e Analgésico Neuropático',
     indication: 'Dor neuropática, fibromialgia, transtorno de ansiedade generalizada.',
     dosageAdult: '150mg a 600mg ao dia.',
@@ -829,7 +872,8 @@ export const OFFLINE_MEDS: Medication[] = [
     notes: 'Receita C1. Frequentemente preferida à gabapentina pela posologia.'
   },
   {
-    name: 'Cetirizina (Zyrtec)',
+    name: 'Cetirizina',
+    brandNames: ['Zyrtec', 'Ceti-Z'],
     class: 'Anti-histamínico (2ª Geração)',
     indication: 'Rinite alérgica e urticária.',
     dosageAdult: '10mg uma vez ao dia.',
@@ -840,7 +884,8 @@ export const OFFLINE_MEDS: Medication[] = [
     notes: 'Pode causar mais sonolência que a loratadina.'
   },
   {
-    name: 'Fexofenadina (Allegra)',
+    name: 'Fexofenadina',
+    brandNames: ['Allegra', 'Rafex'],
     class: 'Anti-histamínico (2ª Geração)',
     indication: 'Rinite alérgica e urticária idiopática crônica.',
     dosageAdult: '60mg 2x/dia ou 120mg/180mg 1x/dia.',
@@ -851,7 +896,8 @@ export const OFFLINE_MEDS: Medication[] = [
     notes: 'Considerado um dos anti-histamínicos que menos causa sono.'
   },
   {
-    name: 'Dexametasona (Decadron)',
+    name: 'Dexametasona',
+    brandNames: ['Decadron', 'Dexamet'],
     class: 'Corticoide Potente',
     indication: 'Processos inflamatórios, alérgicos, edema cerebral, COVID-19 grave.',
     dosageAdult: '0,5mg a 10mg ao dia.',
@@ -873,7 +919,8 @@ export const OFFLINE_MEDS: Medication[] = [
     notes: 'Mulheres grávidas não devem sequer manipular comprimidos quebrados.'
   },
   {
-    name: 'Tamsulosina (Secotex)',
+    name: 'Tamsulosina',
+    brandNames: ['Secotex', 'Tansulon'],
     class: 'Antagonista Alfa-1 Adrenérgico',
     indication: 'Sintomas da hiperplasia prostática benigna (HPB).',
     dosageAdult: '0,4mg uma vez ao dia (após o café).',
@@ -884,7 +931,8 @@ export const OFFLINE_MEDS: Medication[] = [
     notes: 'Ajuda no relaxamento da musculatura da próstata e bexiga.'
   },
   {
-    name: 'Sildenafila (Viagra)',
+    name: 'Sildenafila',
+    brandNames: ['Viagra', 'Pramil'],
     class: 'Inibidor da PDE5',
     indication: 'Disfunção erétil e hipertensão arterial pulmonar.',
     dosageAdult: '25mg a 100mg (conforme necessidade, 1h antes).',
@@ -895,7 +943,8 @@ export const OFFLINE_MEDS: Medication[] = [
     notes: 'NÃO tomar com nitratos (ex: Isordil, Monocordil) - Risco de morte.'
   },
   {
-    name: 'Tadalafila (Cialis)',
+    name: 'Tadalafila',
+    brandNames: ['Cialis', 'Zydalis'],
     class: 'Inibidor da PDE5',
     indication: 'Disfunção erétil, HPB e hipertensão pulmonar.',
     dosageAdult: '5mg (uso diário) ou 20mg (sob demanda).',
@@ -928,7 +977,8 @@ export const OFFLINE_MEDS: Medication[] = [
     notes: 'Essencial para mulheres que desejam engravidar.'
   },
   {
-    name: 'Metoprolol (Selozok)',
+    name: 'Metoprolol',
+    brandNames: ['Selozok', 'Lopressor'],
     class: 'Betabloqueador Seletivo',
     indication: 'Hipertensão, angina, insuficiência cardíaca e após infarto.',
     dosageAdult: '25mg a 200mg uma vez ao dia.',
@@ -950,7 +1000,8 @@ export const OFFLINE_MEDS: Medication[] = [
     notes: 'Tomar com alimentos para reduzir o risco de queda de pressão.'
   },
   {
-    name: 'Lorazepam (Lorax)',
+    name: 'Lorazepam',
+    brandNames: ['Lorax'],
     class: 'Benzodiazepínico',
     indication: 'Ansiedade, insônia associada à ansiedade e sedação pré-operatória.',
     dosageAdult: '1mg a 6mg ao dia divididos.',
@@ -959,6 +1010,171 @@ export const OFFLINE_MEDS: Medication[] = [
     contraindications: ['Glaucoma de ângulo estreito', 'Insuficiência respiratória'],
     sideEffects: ['Sedação', 'Tontura', 'Fraqueza muscular'],
     notes: 'Receita B1 (Azul). Meia-vida intermediária.'
+  },
+  {
+    name: 'Hioscina',
+    brandNames: ['Buscopan'],
+    class: 'Antiespasmódico',
+    indication: 'Cólicas biliares, renais e do trato gastrointestinal.',
+    dosageAdult: '10mg a 20mg (1 a 2 drágeas) 3 a 5 vezes ao dia.',
+    dosageChild: 'Conforme peso e idade (gotas).',
+    interactions: ['Antidepressivos tricíclicos', 'Anti-histamínicos'],
+    contraindications: ['Glaucoma de ângulo fechado', 'Miastenia gravis', 'Megacólon'],
+    sideEffects: ['Boca seca', 'Taquicardia', 'Retenção urinária'],
+    notes: 'Pode causar visão turva temporária.'
+  },
+  {
+    name: 'Prednisolona',
+    class: 'Glicocorticoide',
+    indication: 'Processos inflamatórios, alérgicos e doenças autoimunes.',
+    dosageAdult: '5mg a 60mg ao dia (dose única ou dividida).',
+    dosageChild: '0,14mg a 2mg/kg/dia.',
+    interactions: ['Antidiabéticos', 'AINEs', 'Vacinas de vírus vivos'],
+    contraindications: ['Infecções fúngicas sistêmicas', 'Hipersensibilidade'],
+    sideEffects: ['Aumento de peso', 'Hiperglicemia', 'Osteoporose (uso prolongado)'],
+    notes: 'Não interromper o uso abruptamente se for uso prolongado.'
+  },
+  {
+    name: 'Apixabana',
+    brandNames: ['Eliquis'],
+    class: 'Anticoagulante (Inibidor do Fator Xa)',
+    indication: 'Prevenção de AVC em fibrilação atrial e tratamento de TVP/EP.',
+    dosageAdult: '2,5mg ou 5mg duas vezes ao dia.',
+    dosageChild: 'Não recomendado.',
+    interactions: ['Cetoconazol', 'Rifampicina', 'AINEs'],
+    contraindications: ['Sangramento ativo', 'Doença hepática grave'],
+    sideEffects: ['Sangramentos', 'Anemia', 'Náusea'],
+    notes: 'Não requer monitoramento de RNI.'
+  },
+  {
+    name: 'Insulina NPH',
+    class: 'Insulina de Ação Intermediária',
+    indication: 'Diabetes Mellitus tipo 1 e tipo 2.',
+    dosageAdult: 'Individualizada (geralmente 0,5 a 1 UI/kg/dia).',
+    dosageChild: 'Individualizada.',
+    interactions: ['Betabloqueadores', 'Álcool', 'Corticoides'],
+    contraindications: ['Hipoglicemia'],
+    sideEffects: ['Hipoglicemia', 'Lipodistrofia no local da aplicação'],
+    notes: 'Aspecto leitoso. Deve ser homogeneizada suavemente antes do uso.'
+  },
+  {
+    name: 'Dapagliflozina',
+    brandNames: ['Forxiga'],
+    class: 'Antidiabético (Inibidor de SGLT2)',
+    indication: 'Diabetes tipo 2, Insuficiência Cardíaca e Doença Renal Crônica.',
+    dosageAdult: '10mg uma vez ao dia.',
+    dosageChild: 'Não recomendado.',
+    interactions: ['Diuréticos', 'Insulina'],
+    contraindications: ['Hipersensibilidade grave'],
+    sideEffects: ['Infecções urinárias', 'Candidíase genital', 'Poliúria'],
+    notes: 'Ajuda na perda de peso e redução da pressão arterial.'
+  },
+  {
+    name: 'Semaglutida',
+    brandNames: ['Ozempic', 'Wegovy', 'Rybelsus'],
+    class: 'Agonista do Receptor de GLP-1',
+    indication: 'Diabetes tipo 2 e controle de peso (Wegovy).',
+    dosageAdult: '0,25mg a 1mg uma vez por semana (subcutânea).',
+    dosageChild: 'Não recomendado.',
+    interactions: ['Retardo no esvaziamento gástrico pode afetar outros fármacos'],
+    contraindications: ['Histórico de carcinoma medular de tireoide'],
+    sideEffects: ['Náusea', 'Vômito', 'Diarreia', 'Constipação'],
+    notes: 'Ozempic é injetável semanal; Rybelsus é a versão oral diária.'
+  },
+  {
+    name: 'Levodopa + Benserazida',
+    brandNames: ['Prolopa'],
+    class: 'Antiparkinsoniano',
+    indication: 'Doença de Parkinson.',
+    dosageAdult: '125mg a 250mg, 3 a 4 vezes ao dia.',
+    dosageChild: 'Não indicado.',
+    interactions: ['IMAOs não seletivos', 'Piridoxina (Vitamina B6)'],
+    contraindications: ['Doenças endócrinas, renais ou hepáticas graves'],
+    sideEffects: ['Movimentos involuntários', 'Náusea', 'Hipotensão'],
+    notes: 'Tomar preferencialmente 30 min antes ou 1h após as refeições.'
+  },
+  {
+    name: 'Donepezila',
+    brandNames: ['Ericept'],
+    class: 'Inibidor da Acetilcolinesterase',
+    indication: 'Doença de Alzheimer (leve a grave).',
+    dosageAdult: '5mg a 10mg uma vez ao dia (à noite).',
+    dosageChild: 'Não indicado.',
+    interactions: ['Anticolinérgicos', 'AINEs'],
+    contraindications: ['Hipersensibilidade ao fármaco'],
+    sideEffects: ['Diarreia', 'Cãibras', 'Insônia', 'Náusea'],
+    notes: 'Melhora a função cognitiva e atividades diárias.'
+  },
+  {
+    name: 'Topiramato',
+    class: 'Anticonvulsivante',
+    indication: 'Epilepsia e profilaxia de enxaqueca.',
+    dosageAdult: '25mg a 400mg ao dia divididos.',
+    dosageChild: 'Conforme peso corporal.',
+    interactions: ['Anticoncepcionais', 'Álcool', 'Digoxina'],
+    contraindications: ['Gravidez (risco de fenda palatina)'],
+    sideEffects: ['Parestesia (formigamento)', 'Perda de peso', 'Dificuldade de concentração'],
+    notes: 'Deve ser ingerido com bastante líquido para evitar cálculos renais.'
+  },
+  {
+    name: 'Fenobarbital',
+    brandNames: ['Gardenal'],
+    class: 'Barbitúrico / Anticonvulsivante',
+    indication: 'Epilepsia e crises convulsivas.',
+    dosageAdult: '100mg a 300mg ao dia.',
+    dosageChild: '3mg a 5mg/kg/dia.',
+    interactions: ['Álcool', 'Anticoncepcionais', 'Varfarina'],
+    contraindications: ['Porfiria', 'Insuficiência respiratória grave'],
+    sideEffects: ['Sonolência', 'Dificuldade cognitiva', 'Depressão'],
+    notes: 'Receita B1 (Azul). Potente indutor enzimático.'
+  },
+  {
+    name: 'Nifedipino',
+    brandNames: ['Adalat'],
+    class: 'Bloqueador de Canais de Cálcio',
+    indication: 'Hipertensão arterial e angina de peito.',
+    dosageAdult: '10mg a 60mg ao dia (formulações retard).',
+    dosageChild: 'Uso restrito.',
+    interactions: ['Betabloqueadores', 'Suco de toranja', 'Rifampicina'],
+    contraindications: ['Choque cardiovascular', 'Estenose aórtica grave'],
+    sideEffects: ['Edema periférico (inchaço)', 'Cefaleia', 'Rubor facial'],
+    notes: 'Cápsulas de liberação rápida não devem ser usadas em crises hipertensivas.'
+  },
+  {
+    name: 'Amiodarona',
+    brandNames: ['Ancoron'],
+    class: 'Antiarrítmico Classe III',
+    indication: 'Arritmias ventriculares e supraventriculares graves.',
+    dosageAdult: '100mg a 600mg ao dia (após dose de ataque).',
+    dosageChild: 'Uso restrito.',
+    interactions: ['Varfarina', 'Digoxina', 'Estatinas'],
+    contraindications: ['Bradicardia sinusal', 'Disfunção tireoidiana'],
+    sideEffects: ['Fotossensibilidade', 'Microdepósitos corneanos', 'Fibrose pulmonar'],
+    notes: 'Contém iodo; monitorar função da tireoide e pulmonar.'
+  },
+  {
+    name: 'Bisoprolol',
+    brandNames: ['Concor'],
+    class: 'Betabloqueador Seletivo',
+    indication: 'Hipertensão e insuficiência cardíaca estável.',
+    dosageAdult: '1,25mg a 10mg uma vez ao dia.',
+    dosageChild: 'Não recomendado.',
+    interactions: ['Amiodarona', 'Insulina', 'AINEs'],
+    contraindications: ['Insuficiência cardíaca aguda', 'Asma grave'],
+    sideEffects: ['Bradicardia', 'Mãos e pés frios', 'Fadiga'],
+    notes: 'Um dos betabloqueadores preferidos na insuficiência cardíaca.'
+  },
+  {
+    name: 'Doxazosina',
+    brandNames: ['Duomo'],
+    class: 'Bloqueador Alfa-1 Adrenérgico',
+    indication: 'Hiperplasia Prostática Benigna (HPB) e Hipertensão.',
+    dosageAdult: '1mg a 8mg uma vez ao dia.',
+    dosageChild: 'Não indicado.',
+    interactions: ['Inibidores da PDE5 (Sildenafila)', 'Outros anti-hipertensivos'],
+    contraindications: ['Hipersensibilidade a quinazolinas'],
+    sideEffects: ['Tontura', 'Hipotensão ortostática', 'Edema'],
+    notes: 'Primeira dose deve ser tomada ao deitar para evitar síncope.'
   }
 ];
 
@@ -977,7 +1193,12 @@ export const OFFLINE_INTERACTIONS: Interaction[] = [
   { drugs: 'Rivaroxabana + Cetoconazol', level: 'Alto', effect: 'Aumento da exposição ao anticoagulante.', risk: 'Risco elevado de sangramentos graves.' },
   { drugs: 'Carbamazepina + Anticoncepcional', level: 'Alto', effect: 'Indução enzimática reduz níveis do contraceptivo.', risk: 'Falha na contracepção.' },
   { drugs: 'Fenitoína + Varfarina', level: 'Grave', effect: 'Alteração complexa no tempo de coagulação.', risk: 'Risco de sangramento ou trombose.' },
-  { drugs: 'Dexametasona + Antidiabéticos', level: 'Moderado', effect: 'Corticoide aumenta a glicemia.', risk: 'Descontrole do diabetes.' }
+  { drugs: 'Dexametasona + Antidiabéticos', level: 'Moderado', effect: 'Corticoide aumenta a glicemia.', risk: 'Descontrole do diabetes.' },
+  { drugs: 'Amiodarona + Varfarina', level: 'Grave', effect: 'Potencializa o efeito anticoagulante.', risk: 'Risco altíssimo de hemorragia.' },
+  { drugs: 'Sildenafila + Bloqueadores Alfa', level: 'Moderado', effect: 'Potencializa o efeito hipotensor.', risk: 'Risco de síncope e queda de pressão.' },
+  { drugs: 'Espironolactona + IECA/BRA', level: 'Moderado', effect: 'Efeito aditivo na retenção de potássio.', risk: 'Risco de hipercalemia grave.' },
+  { drugs: 'Clopidogrel + AINEs', level: 'Alto', effect: 'Aumento do risco de sangramento gastrointestinal.', risk: 'Hemorragia digestiva.' },
+  { drugs: 'Liraglutida + Insulina', level: 'Moderado', effect: 'Aumento do risco de hipoglicemia.', risk: 'Crises hipoglicêmicas.' }
 ];
 
 export const OFFLINE_LEGISLATION: Legislation[] = [
@@ -1039,10 +1260,22 @@ export const OFFLINE_LEGISLATION: Legislation[] = [
   }
 ];
 
-export const MEDS_MAP = new Map(OFFLINE_MEDS.map(m => [m.name.toLowerCase(), m]));
+export const MEDS_MAP = new Map<string, Medication>();
+OFFLINE_MEDS.forEach(m => {
+  MEDS_MAP.set(m.name.toLowerCase(), m);
+  if (m.brandNames) {
+    m.brandNames.forEach(bn => MEDS_MAP.set(bn.toLowerCase(), m));
+  }
+});
 
 export const SEARCH_INDEX = {
-  meds: OFFLINE_MEDS.map(m => ({ name: m.name.toLowerCase(), data: m })),
+  meds: OFFLINE_MEDS.flatMap(m => {
+    const entries = [{ name: m.name.toLowerCase(), data: m }];
+    if (m.brandNames) {
+      m.brandNames.forEach(bn => entries.push({ name: bn.toLowerCase(), data: m }));
+    }
+    return entries;
+  }),
   interactions: OFFLINE_INTERACTIONS.map(i => ({ drugs: i.drugs.toLowerCase(), tokens: i.drugs.toLowerCase().split(/[ +]+/), data: i })),
   legislation: OFFLINE_LEGISLATION.map(l => ({ title: l.title.toLowerCase(), data: l }))
 };
