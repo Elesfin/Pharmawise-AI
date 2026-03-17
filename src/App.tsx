@@ -24,7 +24,8 @@ import {
   BookOpen,
   Check,
   CheckCheck,
-  Clock
+  Clock,
+  Share2
 } from 'lucide-react';
 import Markdown from 'react-markdown';
 import { motion, AnimatePresence } from 'motion/react';
@@ -101,6 +102,7 @@ export default function App() {
   const [showSuggestions, setShowSuggestions] = useState(false);
   const [logoUrl, setLogoUrl] = useState<string | null>(null);
   const [isGeneratingLogo, setIsGeneratingLogo] = useState(false);
+  const [activeMeds, setActiveMeds] = useState<Set<string>>(new Set());
   const scrollRef = useRef<HTMLDivElement>(null);
   const messagesEndRef = useRef<HTMLDivElement>(null);
   const suggestionsRef = useRef<HTMLDivElement>(null);
@@ -163,6 +165,20 @@ export default function App() {
     
     setInput('');
     setShowSuggestions(false);
+
+    // Detect medications in current message
+    const detected = detectMeds(userMessage);
+    const newActiveMeds = new Set(activeMeds);
+    detected.forEach(m => newActiveMeds.add(m));
+    
+    // Check for interactions
+    const interactions = findInteractions(Array.from(newActiveMeds));
+    const interactionWarning = interactions.length > 0 
+      ? `\n\n> ⚠️ **ALERTA DE INTERAÇÃO DETECTADO**\n> Identificamos uma possível interação entre: **${interactions[0].drugs}**\n> **Efeito:** ${interactions[0].effect}\n> **Risco:** ${interactions[0].risk}\n> *Consulte sempre um farmacêutico ou médico antes de associar estes medicamentos.*`
+      : '';
+
+    setActiveMeds(newActiveMeds);
+
     setMessages(prev => [...prev, { 
       role: 'user', 
       content: userMessage, 
@@ -188,7 +204,7 @@ export default function App() {
           ...prev.map(m => m.role === 'user' ? { ...m, status: 'read' as const } : m),
           { 
             role: 'assistant', 
-            content: offlineResponse, 
+            content: offlineResponse + interactionWarning, 
             timestamp: new Date().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' }),
             status: 'read' as const,
             isLocal: isDirectMatch
@@ -212,7 +228,7 @@ export default function App() {
         ...prev.map(m => m.role === 'user' ? { ...m, status: 'read' as const } : m),
         { 
           role: 'assistant', 
-          content: response || 'Desculpe, não consegui processar sua solicitação.', 
+          content: (response || 'Desculpe, não consegui processar sua solicitação.') + interactionWarning, 
           timestamp: new Date().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' }),
           status: 'read' as const
         }
@@ -238,6 +254,89 @@ export default function App() {
     } finally {
       setIsLoading(false);
     }
+  };
+
+  const handleShare = async (content: string) => {
+    // Clean markdown for sharing
+    const cleanContent = content.replace(/[#*`>]/g, '');
+    
+    if (navigator.share) {
+      try {
+        await navigator.share({
+          title: 'PharmaWise AI - Informação Técnica',
+          text: cleanContent,
+          url: window.location.href,
+        });
+      } catch (error) {
+        if ((error as Error).name !== 'AbortError') {
+          console.error('Error sharing:', error);
+        }
+      }
+    } else {
+      try {
+        await navigator.clipboard.writeText(cleanContent);
+        setStatusNotification({ message: 'Informação copiada!', type: 'online' });
+        setTimeout(() => setStatusNotification(null), 3000);
+      } catch (error) {
+        console.error('Error copying to clipboard:', error);
+      }
+    }
+  };
+
+  const detectMeds = (text: string): string[] => {
+    const normalized = normalizeText(text);
+    const found: string[] = [];
+    
+    SEARCH_SUGGESTIONS.forEach(s => {
+      if (s.type === 'med' || s.type === 'brand') {
+        const medName = normalizeText(s.label);
+        if (normalized.includes(medName)) {
+          // Find the actual generic name if it's a brand
+          const medData = MEDS_MAP.get(medName);
+          if (medData) found.push(medData.name);
+        }
+      }
+    });
+    
+    return Array.from(new Set(found));
+  };
+
+  const findInteractions = (meds: string[]): Interaction[] => {
+    if (meds.length < 2) return [];
+    
+    const results: Interaction[] = [];
+    const medClasses = meds.map(m => ({
+      name: m,
+      class: MEDS_MAP.get(m.toLowerCase())?.class || ''
+    }));
+
+    OFFLINE_INTERACTIONS.forEach(interaction => {
+      const drugs = interaction.drugs.split(/[ +]+/).filter(d => d !== '');
+      
+      // Check if all drugs in the interaction are present in the meds list
+      // This is a simplified check. It handles "Drug A + Drug B"
+      // It also needs to handle classes like "AINEs"
+      
+      const matchCount = drugs.filter(drug => {
+        const normalizedDrug = normalizeText(drug);
+        
+        // Check by name
+        const nameMatch = meds.some(m => normalizeText(m).includes(normalizedDrug));
+        if (nameMatch) return true;
+        
+        // Check by class (e.g., "AINEs", "Betabloqueadores")
+        const classMatch = medClasses.some(mc => normalizeText(mc.class).includes(normalizedDrug));
+        if (classMatch) return true;
+
+        return false;
+      }).length;
+
+      if (matchCount >= 2 && drugs.length >= 2) {
+        results.push(interaction);
+      }
+    });
+
+    return results;
   };
 
   const normalizeText = (text: string) => {
@@ -627,6 +726,16 @@ export default function App() {
                   <span className="text-[10px] text-slate-400 font-medium">
                     {msg.timestamp}
                   </span>
+                  {msg.role === 'assistant' && (
+                    <button 
+                      onClick={() => handleShare(msg.content)}
+                      className="flex items-center gap-1 text-[10px] text-slate-400 font-medium hover:text-emerald-600 transition-colors ml-2"
+                      title="Compartilhar informação"
+                    >
+                      <Share2 className="w-3 h-3" />
+                      <span className="hidden sm:inline">Compartilhar</span>
+                    </button>
+                  )}
                   {msg.role === 'user' && (
                     <div className="flex items-center">
                       {msg.status === 'sending' && <Clock className="w-3 h-3 text-slate-300 animate-pulse" />}
