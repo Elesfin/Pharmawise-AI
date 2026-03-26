@@ -25,7 +25,11 @@ import {
   Check,
   CheckCheck,
   Clock,
-  Share2
+  Share2,
+  RefreshCw,
+  Globe,
+  Settings,
+  Bell
 } from 'lucide-react';
 import Markdown from 'react-markdown';
 import { motion, AnimatePresence } from 'motion/react';
@@ -83,6 +87,8 @@ const SEARCH_SUGGESTIONS: Suggestion[] = Array.from(
   SUGGESTION_DATA.reduce((map, item) => map.set(item.label, item), new Map<string, Suggestion>()).values()
 ).sort((a, b) => a.label.localeCompare(b.label));
 
+const SEVERITY_LEVELS = ['Moderado', 'Alto', 'Grave', 'Gravíssimo'];
+
 export default function App() {
   const [messages, setMessages] = useState<Message[]>([
     {
@@ -103,6 +109,9 @@ export default function App() {
   const [logoUrl, setLogoUrl] = useState<string | null>(null);
   const [isGeneratingLogo, setIsGeneratingLogo] = useState(false);
   const [activeMeds, setActiveMeds] = useState<Set<string>>(new Set());
+  const [interactionAlert, setInteractionAlert] = useState<Interaction | null>(null);
+  const [alertThreshold, setAlertThreshold] = useState<string>('Grave');
+  const [showSettings, setShowSettings] = useState(false);
   const scrollRef = useRef<HTMLDivElement>(null);
   const messagesEndRef = useRef<HTMLDivElement>(null);
   const suggestionsRef = useRef<HTMLDivElement>(null);
@@ -148,6 +157,29 @@ export default function App() {
     }
   };
 
+  const playAlertSound = () => {
+    try {
+      const audioCtx = new (window.AudioContext || (window as any).webkitAudioContext)();
+      const oscillator = audioCtx.createOscillator();
+      const gainNode = audioCtx.createGain();
+
+      oscillator.connect(gainNode);
+      gainNode.connect(audioCtx.destination);
+
+      oscillator.type = 'sine';
+      oscillator.frequency.setValueAtTime(880, audioCtx.currentTime); // A5
+      oscillator.frequency.exponentialRampToValueAtTime(440, audioCtx.currentTime + 0.5); // A4
+
+      gainNode.gain.setValueAtTime(0.1, audioCtx.currentTime);
+      gainNode.gain.exponentialRampToValueAtTime(0.01, audioCtx.currentTime + 0.5);
+
+      oscillator.start();
+      oscillator.stop(audioCtx.currentTime + 0.5);
+    } catch (e) {
+      console.error('Audio alert failed:', e);
+    }
+  };
+
   useEffect(() => {
     // Small delay to ensure DOM is updated and images/markdown are rendered
     const timeoutId = setTimeout(() => {
@@ -173,6 +205,20 @@ export default function App() {
     
     // Check for interactions
     const interactions = findInteractions(Array.from(newActiveMeds));
+    
+    if (interactions.length > 0) {
+      const thresholdIndex = SEVERITY_LEVELS.indexOf(alertThreshold);
+      const severeInteraction = interactions.find(i => {
+        const levelIndex = SEVERITY_LEVELS.indexOf(i.level || 'Moderado');
+        return levelIndex >= thresholdIndex;
+      });
+      
+      if (severeInteraction) {
+        setInteractionAlert(severeInteraction);
+        playAlertSound();
+      }
+    }
+
     const interactionWarning = interactions.length > 0 
       ? `\n\n> ⚠️ **ALERTA DE INTERAÇÃO DETECTADO**\n> Identificamos uma possível interação entre: **${interactions[0].drugs}**\n> **Efeito:** ${interactions[0].effect}\n> **Risco:** ${interactions[0].risk}\n> *Consulte sempre um farmacêutico ou médico antes de associar estes medicamentos.*`
       : '';
@@ -490,7 +536,7 @@ export default function App() {
         contents: {
           parts: [
             {
-              text: 'A professional, modern, minimalist logo for a pharmacy AI application named "PharmaWise AI". The logo should feature a stylized mortar and pestle or a cross combined with a brain or digital circuit pattern. Colors: Emerald green, slate, and white. Clean lines, high resolution, professional branding style.',
+              text: 'A professional, modern, and minimalist logo for a pharmacy AI application named "PharmaWise AI". The design should feature a stylized mortar and pestle or a medical cross seamlessly integrated with a digital circuit pattern. Use a sophisticated color palette of emerald green, slate gray, and crisp white. Ensure clean, sharp lines, a balanced composition, and a high-end professional branding aesthetic. Vector style, flat design, white background.',
             },
           ],
         },
@@ -545,16 +591,81 @@ export default function App() {
         )}
       </AnimatePresence>
 
+      {/* Interaction Alert Modal */}
+      <AnimatePresence>
+        {interactionAlert && (
+          <div className="fixed inset-0 z-[100] flex items-center justify-center p-4 bg-slate-900/60 backdrop-blur-sm">
+            <motion.div
+              initial={{ scale: 0.9, opacity: 0 }}
+              animate={{ scale: 1, opacity: 1 }}
+              exit={{ scale: 0.9, opacity: 0 }}
+              className="bg-white rounded-3xl shadow-2xl max-w-md w-full overflow-hidden border-4 border-orange-500"
+            >
+              <div className="bg-orange-500 p-6 flex flex-col items-center text-white text-center">
+                <div className="w-16 h-16 bg-white/20 rounded-full flex items-center justify-center mb-4 animate-pulse">
+                  <AlertOctagon className="w-10 h-10 text-white" />
+                </div>
+                <h2 className="text-2xl font-black uppercase tracking-tight">Interação Grave!</h2>
+                <p className="text-orange-100 text-sm font-medium mt-1">Risco detectado na dispensação</p>
+              </div>
+              
+              <div className="p-8 space-y-6">
+                <div className="space-y-2">
+                  <p className="text-[10px] font-bold text-slate-400 uppercase tracking-widest">Medicamentos Envolvidos</p>
+                  <p className="text-lg font-bold text-slate-800 leading-tight">{interactionAlert.drugs}</p>
+                </div>
+                
+                <div className="grid grid-cols-2 gap-4">
+                  <div className="p-3 bg-orange-50 rounded-xl border border-orange-100">
+                    <p className="text-[9px] font-bold text-orange-600 uppercase mb-1">Efeito</p>
+                    <p className="text-xs text-slate-700 font-medium">{interactionAlert.effect}</p>
+                  </div>
+                  <div className="p-3 bg-red-50 rounded-xl border border-red-100">
+                    <p className="text-[9px] font-bold text-red-600 uppercase mb-1">Risco</p>
+                    <p className="text-xs text-slate-700 font-medium">{interactionAlert.risk}</p>
+                  </div>
+                </div>
+
+                <div className="p-4 bg-slate-50 rounded-2xl border border-slate-100 flex gap-3 items-start">
+                  <Info className="w-5 h-5 text-slate-400 shrink-0 mt-0.5" />
+                  <p className="text-xs text-slate-500 leading-relaxed italic">
+                    "Esta combinação pode levar a complicações severas. Recomenda-se a intervenção farmacêutica imediata."
+                  </p>
+                </div>
+
+                <button
+                  onClick={() => setInteractionAlert(null)}
+                  className="w-full py-4 bg-slate-900 text-white rounded-2xl font-bold hover:bg-slate-800 transition-all shadow-lg shadow-slate-200"
+                >
+                  Entendi o Risco
+                </button>
+              </div>
+            </motion.div>
+          </div>
+        )}
+      </AnimatePresence>
+
       {/* Header */}
       <header className="bg-white border-b border-slate-200 px-6 py-4 flex items-center justify-between sticky top-0 z-10 shadow-sm">
         <div className="flex items-center gap-3">
-          <div className="w-10 h-10 bg-emerald-600 rounded-xl flex items-center justify-center shadow-lg shadow-emerald-200 overflow-hidden">
-            {logoUrl ? (
-              <img src={logoUrl} alt="PharmaWise Logo" className="w-full h-full object-cover" referrerPolicy="no-referrer" />
-            ) : isGeneratingLogo ? (
-              <Loader2 className="w-6 h-6 text-white animate-spin" />
-            ) : (
-              <Pill className="text-white w-6 h-6" />
+          <div className="relative group">
+            <div className="w-10 h-10 bg-emerald-600 rounded-xl flex items-center justify-center shadow-lg shadow-emerald-200 overflow-hidden">
+              {logoUrl ? (
+                <img src={logoUrl} alt="PharmaWise Logo" className="w-full h-full object-cover" referrerPolicy="no-referrer" />
+              ) : isGeneratingLogo ? (
+                <Loader2 className="w-6 h-6 text-white animate-spin" />
+              ) : (
+                <Pill className="text-white w-6 h-6" />
+              )}
+            </div>
+            {!isGeneratingLogo && (
+              <button 
+                onClick={generateLogo}
+                className="absolute -bottom-1 -right-1 bg-white border border-slate-200 rounded-full p-1 shadow-sm opacity-0 group-hover:opacity-100 transition-opacity hover:bg-emerald-50 hover:border-emerald-200"
+                title="Regerar Logo"
+              >
+                <RefreshCw className="w-3 h-3 text-emerald-600" />
+              </button>
             )}
           </div>
           <div>
@@ -563,6 +674,62 @@ export default function App() {
           </div>
         </div>
         <div className="flex items-center gap-2 md:gap-4">
+          <div className="relative">
+            <button 
+              onClick={() => setShowSettings(!showSettings)}
+              className={cn(
+                "p-2 rounded-lg transition-all border",
+                showSettings ? "bg-slate-100 border-slate-300 text-slate-900" : "bg-white border-slate-200 text-slate-500 hover:bg-slate-50"
+              )}
+              title="Configurações de Alerta"
+            >
+              <Settings className="w-4 h-4" />
+            </button>
+
+            <AnimatePresence>
+              {showSettings && (
+                <motion.div
+                  initial={{ opacity: 0, y: 10, scale: 0.95 }}
+                  animate={{ opacity: 1, y: 0, scale: 1 }}
+                  exit={{ opacity: 0, y: 10, scale: 0.95 }}
+                  className="absolute right-0 mt-2 w-64 bg-white rounded-2xl shadow-2xl border border-slate-200 p-4 z-50"
+                >
+                  <div className="flex items-center gap-2 mb-4">
+                    <Bell className="w-4 h-4 text-emerald-600" />
+                    <h3 className="text-sm font-bold text-slate-800">Sensibilidade de Alerta</h3>
+                  </div>
+                  
+                  <div className="space-y-1">
+                    {SEVERITY_LEVELS.map((level) => (
+                      <button
+                        key={level}
+                        onClick={() => {
+                          setAlertThreshold(level);
+                          setShowSettings(false);
+                          setStatusNotification({ message: `Sensibilidade alterada para: ${level}`, type: 'online' });
+                          setTimeout(() => setStatusNotification(null), 3000);
+                        }}
+                        className={cn(
+                          "w-full flex items-center justify-between px-3 py-2 rounded-xl text-xs font-medium transition-colors",
+                          alertThreshold === level 
+                            ? "bg-emerald-50 text-emerald-700 border border-emerald-100" 
+                            : "text-slate-600 hover:bg-slate-50"
+                        )}
+                      >
+                        {level}
+                        {alertThreshold === level && <Check className="w-3.5 h-3.5" />}
+                      </button>
+                    ))}
+                  </div>
+                  
+                  <p className="mt-4 text-[10px] text-slate-400 leading-relaxed">
+                    Define o nível mínimo de severidade para disparar o alerta visual e sonoro durante o chat.
+                  </p>
+                </motion.div>
+              )}
+            </AnimatePresence>
+          </div>
+
           <button 
             onClick={() => setShowReference(!showReference)}
             className={cn(
@@ -707,9 +874,14 @@ export default function App() {
                     ? "bg-emerald-600 text-white rounded-tr-none" 
                     : "bg-white border border-slate-100 text-slate-800 rounded-tl-none"
                 )}>
-                  {msg.isLocal && (
+                  {msg.isLocal ? (
                     <div className="absolute -top-2 -right-2 bg-emerald-100 text-emerald-700 text-[9px] font-bold px-2 py-0.5 rounded-full border border-emerald-200 shadow-sm z-10">
                       BASE LOCAL
+                    </div>
+                  ) : msg.role === 'assistant' && (
+                    <div className="absolute -top-2 -right-2 bg-blue-100 text-blue-700 text-[9px] font-bold px-2 py-0.5 rounded-full border border-blue-200 shadow-sm z-10 flex items-center gap-1">
+                      <Globe className="w-2.5 h-2.5" />
+                      FONTE EXTERNA / ANVISA
                     </div>
                   )}
                   <div className={cn(
